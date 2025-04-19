@@ -3,6 +3,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
 const Notification = require("../models/notification");
+
 exports.googleLogin = async (req, res) => {
   const { token } = req.body;
   
@@ -43,7 +44,7 @@ exports.googleLogin = async (req, res) => {
     
 
     // Generate JWT Token
-    const jwtToken = jwt.sign({ id: user._id }, "tutolink", { expiresIn: "7d" });
+    const jwtToken = jwt.sign({ id: user._id }, "tutolink",);
 
     res.json({ token: jwtToken, user });
   } catch (error) {
@@ -65,13 +66,7 @@ exports.googleLogin = async (req, res) => {
   }
 };
 
-
-
-
-
 // Get User by ID
-
-
 exports.getUser = async (req, res) => {
   try {
     const userId = req.user.id; // ✅ Token se user ID extract ho rahi hai
@@ -94,8 +89,6 @@ exports.getUser = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
-
 
 // Update User
 exports.updateUser = async (req, res) => {
@@ -129,7 +122,6 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find(); // Sabhi users la raha hai
@@ -139,9 +131,6 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
-
-
 
 exports.getUserPerformance = async (req, res) => {
   try {

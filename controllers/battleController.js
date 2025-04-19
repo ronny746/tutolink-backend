@@ -1,49 +1,192 @@
-const QuizBattle = require("../models/quizbattle");
+const Battle = require("../models/quizbattle");
+// const Battle = require("../models/Battle");
+const Quiz = require("../models/Quiz");
+const { v4: uuidv4 } = require("uuid");
 const User = require("../models/User");
 const Question = require("../models/questions");
 
 // Create a New Battle
+// exports.createBattle = async (req, res) => {
+//   try {
+//     const { player1, player2, questions } = req.body;
+//     // Create a new battle document
+//     const battle = await QuizBattle.create({
+//       player1,
+//       player2,
+//       questions,
+//       player1Score: 0,
+//       player2Score: 0,
+//       status: "Pending"
+//     });
+//     res.status(201).json({ success: true, message: "Battle created successfully", battle });
+//   } catch (error) {
+//     res.status(500).json({ error: "Error creating battle", details: error.message });
+//   }
+// };
+
 exports.createBattle = async (req, res) => {
   try {
-    const { player1, player2, questions } = req.body;
-    // Create a new battle document
-    const battle = await QuizBattle.create({
-      player1,
-      player2,
-      questions,
-      player1Score: 0,
-      player2Score: 0,
-      status: "Pending"
+    const { quizId, createdBy, startTime } = req.body;
+
+    if (!quizId || !createdBy || !startTime) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+
+    const battleCode = uuidv4().slice(0, 6).toUpperCase(); // Generate battle code
+
+    const battle = new Battle({
+      quizId,
+      battleCode,
+      createdBy,
+      startTime: new Date(startTime),
+      endTime: new Date(new Date(startTime).getTime() + quiz.duration * 60000), // Set end time
+      status: "Upcoming"
     });
-    res.status(201).json({ success: true, message: "Battle created successfully", battle });
+
+    await battle.save();
+
+    res.status(201).json({ message: "Battle created successfully", battle });
   } catch (error) {
-    res.status(500).json({ error: "Error creating battle", details: error.message });
+    console.error("Error creating battle:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 // Join a Battle
+// exports.joinBattle = async (req, res) => {
+//   try {
+//     const { battleId, userId } = req.body;
+//     const battle = await QuizBattle.findById(battleId);
+//     if (!battle) {
+//       return res.status(404).json({ message: "Battle not found" });
+//     }
+//     // Example logic: For simplicity, assume battle already has two players.
+//     res.status(200).json({ success: true, message: `User ${userId} joined the battle`, battle });
+//   } catch (error) {
+//     res.status(500).json({ error: "Error joining battle", details: error.message });
+//   }
+// };
+
 exports.joinBattle = async (req, res) => {
   try {
-    const { battleId, userId } = req.body;
-    const battle = await QuizBattle.findById(battleId);
+    const { battleCode, userId } = req.body;
+
+    const battle = await Battle.findOne({ battleCode }).populate("quizId");
+    
     if (!battle) {
       return res.status(404).json({ message: "Battle not found" });
     }
-    // Example logic: For simplicity, assume battle already has two players.
-    res.status(200).json({ success: true, message: `User ${userId} joined the battle`, battle });
+
+    // 🔹 Fetch user and check if they've taken the quiz before
+    const user = await User.findById(userId).select("quizzesTaken");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+      // 🔹 Check if user has taken this quiz before
+      const hasTakenQuiz = user.quizzesTaken.some(q => q.quizId.toString() === battle.quizId._id.toString());
+
+      if (hasTakenQuiz) {
+        return res.status(403).json({ message: "You have already taken this quiz and cannot join this battle." });
+      }
+
+    if (!battle.participants.includes(userId)) {
+      battle.participants.push(userId);
+      await battle.save();
+    }
+
+    res.status(200).json({
+      message: "Joined battle successfully",
+       startTime: battle.startTime,
+      status: battle.status
+    });
   } catch (error) {
-    res.status(500).json({ error: "Error joining battle", details: error.message });
+    console.error("Error joining battle:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// 🔹 Start Battle (Only when startTime is reached)
+exports.startBattle = async (req, res) => {
+  try {
+    const { battleCode, userId } = req.body;
+    const battle = await Battle.findOne({ battleCode }).populate("quizId");
+
+    if (!battle) {
+      return res.status(404).json({ message: "Battle not found" });
+    }
+
+    const now = new Date();
+    if (now < battle.startTime) {
+      return res.status(400).json({ message: "Battle has not started yet" });
+    }
+
+    battle.status = "Live";
+    await battle.save();
+
+    const remainingTime = Math.max(0, (battle.endTime - now) / 1000);
+
+    res.status(200).json({
+      message: "Battle started!",
+      remainingTime,
+      quizId: battle.quizId._id
+    });
+  } catch (error) {
+    console.error("Error starting battle:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// 🔹 Submit Score
+exports.submitScore = async (req, res) => {
+  try {
+    const { battleCode, userId, score } = req.body;
+    const battle = await Battle.findOne({ battleCode });
+
+    if (!battle) {
+      return res.status(404).json({ message: "Battle not found" });
+    }
+
+    const now = new Date();
+    if (now > battle.endTime) {
+      return res.status(400).json({ message: "Battle has ended" });
+    }
+
+    const existingScore = battle.scores.find(s => s.userId.toString() === userId);
+    if (existingScore) {
+      return res.status(400).json({ message: "Score already submitted" });
+    }
+
+    battle.scores.push({ userId, score, completedAt: new Date() });
+    await battle.save();
+
+    battle.scores.sort((a, b) => b.score - a.score);
+
+    res.status(200).json({
+      message: "Score submitted successfully",
+      rankings: battle.scores.map((s, index) => ({
+        rank: index + 1,
+        userId: s.userId,
+        score: s.score
+      }))
+    });
+  } catch (error) {
+    console.error("Error submitting score:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 // Get Battle Details
 exports.getBattleDetails = async (req, res) => {
   try {
-    const { battleId } = req.query;
-    const battle = await QuizBattle.findById(battleId)
-      .populate("player1", "name")
-      .populate("player2", "name")
-      .populate("questions");
+    const { battleId, userId  } = req.query;
+    const battle = await QuizBattle.findById(battleId);
+      
     if (!battle) {
       return res.status(404).json({ message: "Battle not found" });
     }

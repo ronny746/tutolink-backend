@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #4b6cb7, #182848);
+      background: linear-gradient(135deg, #4b6cb7, #182848); /* Better Gradient */
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -22,36 +22,29 @@
     }
 
     h1 {
-      font-size: 2.8em;
+      font-size: 3em;
       margin-bottom: 10px;
     }
 
     h2 {
       font-weight: 400;
-      margin-bottom: 25px;
-    }
-
-    p {
-      font-size: 1.1em;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .features {
       max-width: 700px;
       text-align: left;
       margin-top: 30px;
-      padding: 0 10px;
     }
 
     .features li {
       margin: 10px 0;
-      font-size: 1.05em;
+      font-size: 1.1em;
     }
 
     .cta {
       margin-top: 40px;
-      font-size: 1.1em;
-      padding: 0 10px;
+      font-size: 1.2em;
     }
 
     .cta a {
@@ -77,8 +70,8 @@
     .marquee span {
       display: inline-block;
       padding-left: 100%;
-      animation: scroll 30s linear infinite;
-      font-size: 1.05em;
+      animation: scroll 15s linear infinite;
+      font-size: 1.1em;
       color: #ffdd57;
     }
 
@@ -86,42 +79,10 @@
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2em;
-      }
-
-      .features li {
-        font-size: 1em;
-      }
-
-      .marquee span {
-        font-size: 1em;
-      }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.6em;
-      }
-
-      h2 {
-        font-size: 1.1em;
-      }
-
-      .cta {
-        font-size: 1em;
-      }
-    }
   </style>
 </head>
 <body>
-  <script>
-    fetch('/api/track/visit', { method: 'POST' }).catch(err => console.error('Tracking failed', err));
-  </script>
-
+  
   <div class="marquee"><span>🔥 New Feature: Ask anything to your AI Buddy – Get smart answers instantly!</span></div>
   <div class="marquee"><span>⚔️ Join Quiz Battles with friends and win amazing dares & rewards!</span></div>
   <div class="marquee"><span>📚 TutoLink is the future of fun + learning – launching soon!</span></div>

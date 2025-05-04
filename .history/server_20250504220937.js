@@ -11,7 +11,7 @@ const onboardingRoutes = require("./routes/onboardingRoutes");
 const notificationRoutes = require("./routes/notification");
 const battleRoutes = require("./routes/battleRoutes");
 const dailyCheckInRoutes = require("./routes/dailyCheckInRoutes");
-const trackRoutes = require("./routes/trackRoutes");
+const trackRoutes = require("./routes/");
 
 
 require("./sockets/scheduler");

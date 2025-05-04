@@ -22,11 +22,12 @@ app.use(cors());
 app.use("/uploads", express.static("uploads"));
 
 
-
-mongoose.connect("mongodb://127.0.0.1:27017/tutolink", { useNewUrlParser: true, useUnifiedTopology: true })
+// mongodb://127.0.0.1:27017/tutolink
+mongoose.connect("mongodb+srv://geniusattechie:tF2Oe1CBjJVdL9xZ@cluster0.oxahl6y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+   { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
-
+ 
 app.use("/api/auth", authRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/content", contentRoutes);

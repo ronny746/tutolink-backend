@@ -14,6 +14,13 @@ const dailyCheckInRoutes = require("./routes/dailyCheckInRoutes");
 
 require("./sockets/scheduler");
 
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+
 
 const app = express();
 app.use(express.json());
@@ -36,13 +43,6 @@ app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/battle", battleRoutes);
 app.use("/api/dailyCheckIn", dailyCheckInRoutes);
-
-const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
 
 
 app.listen(3000, () => console.log("Server running on port 3000"));

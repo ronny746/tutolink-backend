@@ -13,7 +13,7 @@ const battleRoutes = require("./routes/battleRoutes");
 const dailyCheckInRoutes = require("./routes/dailyCheckInRoutes");
 const trackRoutes = require("./routes/trackRoutes");
 const contactRoutes = require("./routes/contactRoutes");
-
+app.use("/api/contact", contactRoutes);
 
 
 
@@ -42,7 +42,6 @@ app.use("/api/notification", notificationRoutes);
 app.use("/api/battle", battleRoutes);
 app.use("/api/dailyCheckIn", dailyCheckInRoutes);
 app.use("/api/track", trackRoutes);
-app.use("/api/contact", contactRoutes);
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {

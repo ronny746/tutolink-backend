@@ -42,7 +42,6 @@ app.use("/api/notification", notificationRoutes);
 app.use("/api/battle", battleRoutes);
 app.use("/api/dailyCheckIn", dailyCheckInRoutes);
 app.use("/api/track", trackRoutes);
-app.use("/api/contact", contactRoutes);
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {

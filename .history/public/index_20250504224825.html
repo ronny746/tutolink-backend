@@ -115,37 +115,12 @@
         font-size: 1em;
       }
     }
-
-    /* Contact Us Button */
-    .contact-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #ffdd57;
-      color: #182848;
-      padding: 12px 20px;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 999;
-      transition: background-color 0.3s ease;
-    }
-
-    .contact-btn:hover {
-      background-color: #ffd700;
-    }
-
   </style>
 </head>
 <body>
   <script>
     fetch('/api/track/visit', { method: 'POST' }).catch(err => console.error('Tracking failed', err));
   </script>
-
-  <!-- Contact Us Button -->
-  <button class="contact-btn" onclick="window.location.href='/request'">Request</button>
-
 
   <h1>🚀 Welcome to TutoLink</h1>
   <h2>India's Smartest Quiz Battle Platform</h2>

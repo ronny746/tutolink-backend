@@ -4,6 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const classCourseRoutes = require("./routes/classCourseRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const contentRoutes = require("./routes/contentRoutes");
 const quizRoutes = require("./routes/quizRoutes");
@@ -31,6 +33,8 @@ mongoose.connect(process.env.MONGO_URL
   .catch(err => console.error(err));
  
 app.use("/api/auth", authRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/classOrCourse", classCourseRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/quizzes", quizRoutes);

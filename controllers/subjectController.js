@@ -2,14 +2,17 @@ const Subject = require("../models/Subject");
 const Image = require("../models/images");
 const { v4: uuidv4 } = require("uuid");
 const { bucket } = require("../config/firebase");
+
 // ✅ Create Subject
 exports.createSubject = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, classOrCourseId} = req.body;
     const file = req.file;
 
     if (!file) return res.status(400).json({ error: "No file uploaded" });
     if (!name) return res.status(400).json({ error: "Subject name is required" });
+    if (!classOrCourseId) return res.status(400).json({ error: "Course or Class Id is required" });
+   
     const fileId = uuidv4();
     const fileUpload = bucket.file(`subjects/${fileId}-${file.originalname}`);
 
@@ -17,7 +20,7 @@ exports.createSubject = async (req, res) => {
 
     const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
 
-    const subject = new Subject({ name, description, iconUrl: url });
+    const subject = new Subject({ name, description,classOrCourseId, iconUrl: url });
     await subject.save();
 
     res.status(201).json({ message: "Subject created successfully", subject });
@@ -33,6 +36,18 @@ exports.getSubjects = async (req, res) => {
     res.json({ message: "Subjects fetched successfully", subjects });
   } catch (error) {
     res.status(500).json({ error: "Error fetching subjects", details: error.message });
+  }
+};
+
+
+// GET /api/subjects?classOrCourseId=xyz456
+exports.getSubjectsByClassOrCourse = async (req, res) => {
+  try {
+    const { classOrCourseId } = req.query;
+    const subjects = await Subject.find({ classOrCourseId });
+    res.json({ subjects });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch subjects", details: error.message });
   }
 };
 

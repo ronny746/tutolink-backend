@@ -18,9 +18,14 @@ exports.createSubject = async (req, res) => {
 
     await fileUpload.save(file.buffer, { contentType: file.mimetype });
 
-    const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
+    let url;
+    try {
+      [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
+    } catch (err) {
+      return res.status(500).json({ error: "Error generating file URL", details: err.message });
+    }
 
-    const subject = new Subject({ name, description,classOrCourseId, iconUrl: url });
+    const subject = new Subject({ name, description, classOrCourseId, iconUrl: url });
     await subject.save();
 
     res.status(201).json({ message: "Subject created successfully", subject });
@@ -55,9 +60,9 @@ exports.getSubjectsByClassOrCourse = async (req, res) => {
 exports.updateSubject = async (req, res) => {
   try {
 
-    const { id, iconUrl } = req.body;
+    const { id, iconUrl, classOrCourseId } = req.body;
 
-    const subject = await Subject.findByIdAndUpdate(id, { iconUrl }, { new: true });
+    const subject = await Subject.findByIdAndUpdate(id, { iconUrl }, { classOrCourseId },{ new: true });
 
     if (!subject) return res.status(404).json({ error: "Subject not found" });
 

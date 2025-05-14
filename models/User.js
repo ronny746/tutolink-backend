@@ -9,6 +9,9 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, enum: ["student", "teacher", "admin"], default: "student" },
   points: { type: Number, default: 0 },
   rank: { type: Number, default: 0 }, // ✅ Rank Field Added
+   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category" }, 
+  classOrCourseId: { type: mongoose.Schema.Types.ObjectId, ref: "ClassOrCourse" }, 
+  selectedSubjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }], 
   quizzesTaken: [
     {
       quizId: { type: mongoose.Schema.Types.ObjectId, ref: "Quiz" },

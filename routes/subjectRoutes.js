@@ -21,10 +21,11 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../config/widdlware");
-const { createSubject, getSubjects, deleteSubject, updateSubject, uploadImage } = require("../controllers/subjectController");
+const { createSubject, getAllSubjects, getSubjects, deleteSubject, updateSubject, uploadImage } = require("../controllers/subjectController");
 
 router.post("/create", upload.single("file"), createSubject);
-router.get("/", getSubjects);
+router.get("/", getAllSubjects);
+router.get("/by-id", getSubjects);
 router.delete("/delete", deleteSubject);
 router.put("/update", updateSubject);
 router.post("/upload-image", upload.single("file"), uploadImage);

@@ -6,26 +6,19 @@ const { bucket } = require("../config/firebase");
 // ✅ Create Subject
 exports.createSubject = async (req, res) => {
   try {
-    const { name, description, classOrCourseId} = req.body;
-    const file = req.file;
+    const { name, description, classOrCourseId, iconUrl } = req.body;
 
-    if (!file) return res.status(400).json({ error: "No file uploaded" });
     if (!name) return res.status(400).json({ error: "Subject name is required" });
-    if (!classOrCourseId) return res.status(400).json({ error: "Course or Class Id is required" });
-   
-    const fileId = uuidv4();
-    const fileUpload = bucket.file(`subjects/${fileId}-${file.originalname}`);
+    if (!classOrCourseId) return res.status(400).json({ error: "Class or Course ID is required" });
+    if (!iconUrl) return res.status(400).json({ error: "Icon URL is required" });
 
-    await fileUpload.save(file.buffer, { contentType: file.mimetype });
+    const subject = new Subject({
+      name,
+      description,
+      classOrCourseId,
+      iconUrl
+    });
 
-    let url;
-    try {
-      [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
-    } catch (err) {
-      return res.status(500).json({ error: "Error generating file URL", details: err.message });
-    }
-
-    const subject = new Subject({ name, description, classOrCourseId, iconUrl: url });
     await subject.save();
 
     res.status(201).json({ message: "Subject created successfully", subject });
@@ -35,12 +28,38 @@ exports.createSubject = async (req, res) => {
 };
 
 // ✅ Get All Subjects
-exports.getSubjects = async (req, res) => {
+exports.getAllSubjects = async (req, res) => {
   try {
     const subjects = await Subject.find().lean();
     res.json({ message: "Subjects fetched successfully", subjects });
   } catch (error) {
     res.status(500).json({ error: "Error fetching subjects", details: error.message });
+  }
+};
+
+exports.getSubjects = async (req, res) => {
+  try {
+    const { classOrCourseId } = req.query;
+
+    // Validate input
+    if (!classOrCourseId) {
+      return res.status(400).json({ error: "classOrCourseId is required" });
+    }
+
+    // Fetch subjects matching the given course ID
+    const subjects = await Subject.find({ classOrCourseId })
+      .populate("classOrCourseId", "name description") // populate only necessary fields
+      .lean();
+
+    res.status(200).json({
+      message: "Subjects fetched successfully",
+      subjects
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error fetching subjects",
+      details: error.message
+    });
   }
 };
 
@@ -59,10 +78,15 @@ exports.getSubjectsByClassOrCourse = async (req, res) => {
 // ✅ Update Subject
 exports.updateSubject = async (req, res) => {
   try {
-
     const { id, iconUrl, classOrCourseId } = req.body;
 
-    const subject = await Subject.findByIdAndUpdate(id, { iconUrl }, { classOrCourseId },{ new: true });
+    if (!id) return res.status(400).json({ error: "Subject ID is required" });
+
+    const updateData = {};
+    if (iconUrl) updateData.iconUrl = iconUrl;
+    if (classOrCourseId) updateData.classOrCourseId = classOrCourseId;
+
+    const subject = await Subject.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!subject) return res.status(404).json({ error: "Subject not found" });
 
@@ -71,6 +95,7 @@ exports.updateSubject = async (req, res) => {
     res.status(500).json({ error: "Error updating subject", details: error.message });
   }
 };
+
 
 // ✅ Delete Subject
 exports.deleteSubject = async (req, res) => {
@@ -86,25 +111,24 @@ exports.deleteSubject = async (req, res) => {
   }
 };
 
+
 exports.uploadImage = async (req, res) => {
   try {
-    const { title } = req.body;
     const file = req.file;
-
     if (!file) return res.status(400).json({ error: "No file uploaded" });
-    if (!title) return res.status(400).json({ error: "Image title is required" });
+
     const fileId = uuidv4();
-    const fileUpload = bucket.file(`images/${fileId}-${file.originalname}`);
+    const fileUpload = bucket.file(`subjects/${fileId}-${file.originalname}`);
 
     await fileUpload.save(file.buffer, { contentType: file.mimetype });
 
-    const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
+    const [url] = await fileUpload.getSignedUrl({
+      action: "read",
+      expires: "01-01-2030", // or use a Date object
+    });
 
-    const image = new Image({ title, imageUrl: url });
-    await image.save();
-
-    res.status(201).json({ message: "Image created successfully", image });
+    res.status(200).json({ iconUrl: url });
   } catch (error) {
-    res.status(500).json({ error: "Error creating Image", details: error.message });
+    res.status(500).json({ error: "Image upload failed", details: error.message });
   }
-}
+};

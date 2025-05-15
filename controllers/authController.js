@@ -128,7 +128,11 @@ exports.deleteUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find(); // Sabhi users la raha hai
+    const users = await User.find().populate([
+      "categoryId",
+      "classOrCourseId",
+      "selectedSubjects",
+    ]).lean();
 
     res.json(users);
   } catch (error) {

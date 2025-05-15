@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const classCourseRoutes = require("./routes/classCourseRoutes");
@@ -33,6 +34,7 @@ mongoose.connect(
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
  
+app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/classOrCourse", classCourseRoutes);

@@ -14,7 +14,7 @@ exports.getCategories = async (req, res) => {
 // Create a new category
 exports.createCategory = async (req, res) => {
   try {
-    const { title, description, color1, color2 } = req.body;
+    const { title, description, color } = req.body;
     const file = req.file;
 
     if (!file) return res.status(400).json({ error: "No file uploaded" });
@@ -23,14 +23,14 @@ exports.createCategory = async (req, res) => {
     const fileUpload = bucket.file(`cources/${fileId}-${file.originalname}`);
     await fileUpload.save(file.buffer, { contentType: file.mimetype });
 
-    const [icon] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
+    const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
 
 
     // Check if category already exists
     const existing = await Category.findOne({ title });
     if (existing) return res.status(400).json({ error: "Category already exists" });
 
-    const category = new Category({ title, description, color1,color2, icon });
+    const category = new Category({ title, description, color, url });
     await category.save();
 
     res.status(201).json({ message: "Category created", category });

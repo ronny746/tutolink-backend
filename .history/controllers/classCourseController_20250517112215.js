@@ -5,7 +5,7 @@ exports.getClassesOrCourses = async (req, res) => {
   try {
     const { categoryId } = req.query;
     const filter = categoryId ? { categoryId } : {};
-    const classesOrCourses = await ClassOrCourse.find(filter);
+    const classesOrCourses = await ClassOrCourse.find(filter).populate("categoryId").lean();
 
     if (!classesOrCourses || classesOrCourses.length === 0) {
       return res.status(404).json({ error: "No classes or courses found" });

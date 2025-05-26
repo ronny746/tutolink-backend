@@ -14,7 +14,7 @@ exports.getCategories = async (req, res) => {
 // Create a new category
 exports.createCategory = async (req, res) => {
   try {
-    const { title, description, color1, color2 } = req.body;
+    const { title, description, color } = req.body;
     const file = req.file;
 
     if (!file) return res.status(400).json({ error: "No file uploaded" });
@@ -30,7 +30,7 @@ exports.createCategory = async (req, res) => {
     const existing = await Category.findOne({ title });
     if (existing) return res.status(400).json({ error: "Category already exists" });
 
-    const category = new Category({ title, description, color1,color2, icon });
+    const category = new Category({ title, description, color, url });
     await category.save();
 
     res.status(201).json({ message: "Category created", category });

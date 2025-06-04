@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const ClassOrCourseSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // e.g., "Class 6"
+  title: { type: String, required: true }, // e.g., "Class 6"
   color1: { type: String, required: true },
   color2: { type: String, required: true },
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },

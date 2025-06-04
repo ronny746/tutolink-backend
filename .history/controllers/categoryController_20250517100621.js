@@ -1,6 +1,5 @@
 const Category = require("../models/category");
-const { bucket } = require("../config/firebase");
-const { v4: uuidv4 } = require("uuid");
+
 // Get all categories
 exports.getCategories = async (req, res) => {
   try {
@@ -14,25 +13,15 @@ exports.getCategories = async (req, res) => {
 // Create a new category
 exports.createCategory = async (req, res) => {
   try {
-    const { title, description, color1, color2 } = req.body;
-    const file = req.file;
-
-    if (!file) return res.status(400).json({ error: "No file uploaded" });
-
-    const fileId = uuidv4();
-    const fileUpload = bucket.file(`cources/${fileId}-${file.originalname}`);
-    await fileUpload.save(file.buffer, { contentType: file.mimetype });
-
-    const [icon] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
-
+    const { title, description, color, icon } = req.body;
 
     // Check if category already exists
     const existing = await Category.findOne({ title });
     if (existing) return res.status(400).json({ error: "Category already exists" });
 
-    const category = new Category({ title, description, color1,color2, icon });
+    const category = new Category({ title, description, color, icon });
     await category.save();
-
+    
     res.status(201).json({ message: "Category created", category });
   } catch (error) {
     res.status(500).json({ error: "Error creating category", details: error.message });

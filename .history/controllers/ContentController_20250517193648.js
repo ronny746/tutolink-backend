@@ -159,10 +159,10 @@ exports.getHome = async (req, res) => {
     ];
 
     // ✅ 2. Fetch All Required Data in Parallel
-    const user = await User.findById(userId, "name points dailyScore lastCheckIn categoryId classOrCourseId");
-    console.log(user.classOrCourseId);
+    const user = await User.findById(userId, "name points dailyScore lastCheckIn categoryId");
+    console.log(user.classOrCourseId)
     const [subjects, mysliders, featuredQuizzes, allQuizzes, latestContent, topRankedUsers] = await Promise.all([
-      Subject.find({ classOrCourseId: user.classOrCourseId}, "name description iconUrl"), // 🟢 Filtered by user's category
+      Subject.find({ classOrCourseId: user.classOrCourseId }, "name description iconUrl"), // 🟢 Filtered by user's category
       Slider.find().sort({ createdAt: -1 }),
       Quiz.find({ categoryId: user.categoryId }, "name totalQuestions duration rating startTime instructions").sort({ rating: -1 }),
       Quiz.find({ categoryId: user.categoryId }).sort({ startTime: 1 }),

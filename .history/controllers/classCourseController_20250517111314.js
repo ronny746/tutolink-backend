@@ -5,7 +5,7 @@ exports.getClassesOrCourses = async (req, res) => {
   try {
     const { categoryId } = req.query;
     const filter = categoryId ? { categoryId } : {};
-    const classesOrCourses = await ClassOrCourse.find(filter);
+    const classesOrCourses = await ClassOrCourse.find(filter).populate("categoryId").lean();
 
     if (!classesOrCourses || classesOrCourses.length === 0) {
       return res.status(404).json({ error: "No classes or courses found" });
@@ -20,20 +20,14 @@ exports.getClassesOrCourses = async (req, res) => {
 // Create a new class/course
 exports.createClassOrCourse = async (req, res) => {
   try {
-    const payload = Array.isArray(req.body) ? req.body : [req.body];
+    const { title, color, categoryId } = req.body;
 
-    const dataToInsert = payload.map(({ name, color1, color2, categoryId }) => ({
-      name: name,
-      color1: color1,
-      color2:color2,
-      categoryId,
-    }));
+    const classOrCourse = new ClassOrCourse({ title, color, icon, categoryId });
+    await classOrCourse.save();
 
-    const created = await ClassOrCourse.insertMany(dataToInsert);
-
-    res.status(201).json({ message: "Class/Course(s) created", data: created });
+    res.status(201).json({ message: "Class/Course created", classOrCourse });
   } catch (error) {
-    res.status(500).json({ error: "Error creating class/course(s)", details: error.message });
+    res.status(500).json({ error: "Error creating class/course", details: error.message });
   }
 };
 

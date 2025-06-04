@@ -98,7 +98,7 @@ exports.getUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({ message: "User updated successfully", user });

@@ -5,7 +5,7 @@ exports.getClassesOrCourses = async (req, res) => {
   try {
     const { categoryId } = req.query;
     const filter = categoryId ? { categoryId } : {};
-    const classesOrCourses = await ClassOrCourse.find(filter);
+    const classesOrCourses = await ClassOrCourse.find(filter).populate("categoryId").lean();
 
     if (!classesOrCourses || classesOrCourses.length === 0) {
       return res.status(404).json({ error: "No classes or courses found" });
@@ -23,9 +23,10 @@ exports.createClassOrCourse = async (req, res) => {
     const payload = Array.isArray(req.body) ? req.body : [req.body];
 
     const dataToInsert = payload.map(({ name, color1, color2, categoryId }) => ({
-      name: name,
-      color1: color1,
-      color2:color2,
+      title: name,
+      color1: [color1, color2],
+      c
+      icon: "", // optional: set default or get from req
       categoryId,
     }));
 

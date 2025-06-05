@@ -162,7 +162,7 @@ exports.getHome = async (req, res) => {
     const user = await User.findById(userId, "name points dailyScore lastCheckIn categoryId classOrCourseId");
     console.log(user.classOrCourseId);
     const [subjects, mysliders, featuredQuizzes, allQuizzes, latestContent, topRankedUsers] = await Promise.all([
-      Subject.find({ classOrCourseId: user.classOrCourseId }, "name description iconUrl"), // 🟢 Filtered by user's category
+      Subject.find({ classOrCourseId: user.classOrCourseId}, "name description iconUrl"), // 🟢 Filtered by user's category
       Slider.find().sort({ createdAt: -1 }),
       Quiz.find({ classOrCourseId: user.classOrCourseId }, "name totalQuestions duration rating startTime instructions").sort({ rating: -1 }),
       Quiz.find({ classOrCourseId: user.classOrCourseId }).sort({ startTime: 1 }),
@@ -210,6 +210,9 @@ exports.getHome = async (req, res) => {
       };
     });
 
+    const playedQuizIds = user.quizzesTaken.map(q => q.quizId?.toString());
+
+
     const unreadNotificationsCount = await Notification.countDocuments({
       userId: userId,
       isRead: false
@@ -224,24 +227,14 @@ exports.getHome = async (req, res) => {
     }));
 
     // 🟢 4. Featured Quizzes with Colors
-    const quizzesWithColors = featuredQuizzes.map((quiz, index) => ({
-      ...quiz._doc,
-      color1: colors[(index + subjects.length) % colors.length].color1,
-      color2: colors[(index + subjects.length) % colors.length].color2
-    }));
+   
 
     // 🟢 5. Upcoming Quizzes (Next 10 Quizzes)
-    const upcomingQuizzes = allQuizzes
-      .filter(quiz => quiz.status === "Upcoming")
-      .slice(0, 10);
+    const upcomingQuizzes = allQuizzes.filter(quiz => new Date(quiz.startTime) > currentTime).slice(0, 10);
 
-    // 🟡 Ongoing (Live) Quizzes
-    const ongoingQuizzes = allQuizzes
-      .filter(quiz => quiz.status === "Live")
-      .slice(0, 10);
+    // 🟢 6. Ongoing Quizzes (Active Quizzes)
+    const ongoingQuizzes = allQuizzes.filter(quiz => new Date(quiz.startTime) <= currentTime && new Date(quiz.endTime) > currentTime);
 
-    // 🔴 Ended Quizzes
-   
     // 🟢 7. User Stats (Rank & Points)
     const higherRankedUsers = await User.countDocuments({ points: { $gt: user.points } });
     const userRank = higherRankedUsers + 1; // Rank starts from 1
@@ -251,7 +244,6 @@ exports.getHome = async (req, res) => {
       ...u._doc,
       name: u._id.toString() === userId ? "You" : u.name
     }));
-
 
     // 📢 9. Response Data
     res.json({

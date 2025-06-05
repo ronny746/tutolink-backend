@@ -231,17 +231,11 @@ exports.getHome = async (req, res) => {
     }));
 
     // 🟢 5. Upcoming Quizzes (Next 10 Quizzes)
-    const upcomingQuizzes = allQuizzes
-      .filter(quiz => quiz.status === "Upcoming")
-      .slice(0, 10);
+    const upcomingQuizzes = allQuizzes.filter(quiz => new Date(quiz.startTime) > currentTime).slice(0, 10);
 
-    // 🟡 Ongoing (Live) Quizzes
-    const ongoingQuizzes = allQuizzes
-      .filter(quiz => quiz.status === "Live")
-      .slice(0, 10);
+    // 🟢 6. Ongoing Quizzes (Active Quizzes)
+    const ongoingQuizzes = allQuizzes.filter(quiz => new Date(quiz.startTime) <= currentTime && new Date(quiz.endTime) > currentTime);
 
-    // 🔴 Ended Quizzes
-   
     // 🟢 7. User Stats (Rank & Points)
     const higherRankedUsers = await User.countDocuments({ points: { $gt: user.points } });
     const userRank = higherRankedUsers + 1; // Rank starts from 1
@@ -251,7 +245,8 @@ exports.getHome = async (req, res) => {
       ...u._doc,
       name: u._id.toString() === userId ? "You" : u.name
     }));
-
+    const playedIds = new Set((user.quizzesTaken || []).map(q => q.quizId?.toString()));
+    const quizzes = allQuizzes.map(q => ({ ...q._doc, isPlayed: playedIds.has(q._id.toString()) }));
 
     // 📢 9. Response Data
     res.json({
@@ -275,7 +270,7 @@ exports.getHome = async (req, res) => {
         featuredQuizzes: { // 🟢 Featured Quizzes
           type: "quizzes",
           heading: "Featured Quizzes",
-          items: quizzesWithColors
+          items: quizzes
         },
         ongoingQuizzes: { // 🟢 Ongoing Quizzes
           type: "quizzes",

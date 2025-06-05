@@ -5,7 +5,7 @@ const { verifyToken } = require("../config/authMiddleware");
 
 // Create a New Battle
 router.post("/create", battleController.createBattle);
-router.get("/", battleController.getAllBattles);
+router.get("/getallbattle",verifyToken, battleController.getAllBattlesUser);
 
 // Join a Battle
 router.post("/join", battleController.joinBattle);

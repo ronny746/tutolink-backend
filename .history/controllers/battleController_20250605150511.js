@@ -387,21 +387,33 @@ exports.getAllBattlesUser = async (req, res) => {
 };
 exports.getAllBattles = async (req, res) => {
   try {
+    // Ensure req.user exists (this depends on your authentication logic)
+   
+
     const battles = await Battle.find();
 
-    res.status(200).json({
-      success: true,
-      battles,
+    // Function to format time in hh:mm:ss format
+    
+
+    // Map over the battles and structure the response as per your requirement
+    const battleDetails = battles.map(battle => {
+      const participantsIds = battle.participants.map(p => p._id.toString());
+      return {
+        title: battle.quizId ? battle.quizId.name : 'N/A',
+        code: battle.battleCode,
+        time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
+        creator: battle.createdBy ? battle.createdBy.username : 'Unknown',
+        participants: battle.participants.length,
+        joined: participantsIds.includes(req.user._id.toString()),  // Ensure user is part of the battle
+      };
     });
+
+    res.status(200).json({ success: true, battles: battleDetails });
   } catch (error) {
-    console.error("❌ Error fetching battles:", error.message);
-    res.status(500).json({
-      error: "Error fetching battles",
-      details: error.message,
-    });
+    console.error(error);  // Add logging for debugging purposes
+    res.status(500).json({ error: "Error fetching battles", details: error.message });
   }
 };
-
 
 // Asynchronous checkAnswer function that fetches the question from the database
 async function checkAnswer(questionId, providedAnswer) {

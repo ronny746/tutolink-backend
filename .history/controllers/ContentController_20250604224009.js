@@ -210,6 +210,11 @@ exports.getHome = async (req, res) => {
       };
     });
 
+
+    const hasUserPlayedQuiz = (user, quizId) => {
+      return (user?.quizzesTaken || []).some(q => q.quizId?._id?.toString() === quizId.toString());
+    };
+
     const unreadNotificationsCount = await Notification.countDocuments({
       userId: userId,
       isRead: false
@@ -224,24 +229,33 @@ exports.getHome = async (req, res) => {
     }));
 
     // 🟢 4. Featured Quizzes with Colors
-    const quizzesWithColors = featuredQuizzes.map((quiz, index) => ({
-      ...quiz._doc,
-      color1: colors[(index + subjects.length) % colors.length].color1,
-      color2: colors[(index + subjects.length) % colors.length].color2
-    }));
+    // const playedQuizIds = (user.quizzesTaken || [])
+    //   .filter(q => q.quizId)
+    //   .map(q => q.quizId.toString());
+    const isPlayed = hasUserPlayedQuiz(user, quiz._id);
+
+
+    const quizzesWithColors = featuredQuizzes.map((quiz, index) => {
+      const isPlayed = (user?.quizzesTaken || []).some(
+        q => q.quizId?._id?.toString() === quiz._id.toString()
+      );
+
+      return {
+        ...quiz._doc,
+        color1: colors[(index + subjects.length) % colors.length].color1,
+        color2: colors[(index + subjects.length) % colors.length].color2,
+        isPlayed
+      };
+    });
+
+
 
     // 🟢 5. Upcoming Quizzes (Next 10 Quizzes)
-    const upcomingQuizzes = allQuizzes
-      .filter(quiz => quiz.status === "Upcoming")
-      .slice(0, 10);
+    const upcomingQuizzes = allQuizzes.filter(quiz => new Date(quiz.startTime) > currentTime).slice(0, 10);
 
-    // 🟡 Ongoing (Live) Quizzes
-    const ongoingQuizzes = allQuizzes
-      .filter(quiz => quiz.status === "Live")
-      .slice(0, 10);
+    // 🟢 6. Ongoing Quizzes (Active Quizzes)
+    const ongoingQuizzes = allQuizzes.filter(quiz => new Date(quiz.startTime) <= currentTime && new Date(quiz.endTime) > currentTime);
 
-    // 🔴 Ended Quizzes
-   
     // 🟢 7. User Stats (Rank & Points)
     const higherRankedUsers = await User.countDocuments({ points: { $gt: user.points } });
     const userRank = higherRankedUsers + 1; // Rank starts from 1
@@ -251,7 +265,6 @@ exports.getHome = async (req, res) => {
       ...u._doc,
       name: u._id.toString() === userId ? "You" : u.name
     }));
-
 
     // 📢 9. Response Data
     res.json({

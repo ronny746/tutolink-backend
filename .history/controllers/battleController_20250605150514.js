@@ -387,21 +387,22 @@ exports.getAllBattlesUser = async (req, res) => {
 };
 exports.getAllBattles = async (req, res) => {
   try {
+    // Ensure req.user exists (this depends on your authentication logic)
+   
+
     const battles = await Battle.find();
 
-    res.status(200).json({
-      success: true,
-      battles,
-    });
+    // Function to format time in hh:mm:ss format
+    
+
+    
+
+    res.status(200).json({ success: true, battles: battleDetails });
   } catch (error) {
-    console.error("❌ Error fetching battles:", error.message);
-    res.status(500).json({
-      error: "Error fetching battles",
-      details: error.message,
-    });
+    console.error(error);  // Add logging for debugging purposes
+    res.status(500).json({ error: "Error fetching battles", details: error.message });
   }
 };
-
 
 // Asynchronous checkAnswer function that fetches the question from the database
 async function checkAnswer(questionId, providedAnswer) {

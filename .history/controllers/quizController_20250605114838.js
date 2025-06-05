@@ -242,7 +242,7 @@ exports.getPDFReview = async (req, res) => {
 
     const quiz = await Quiz.findById(quizId).populate('questions');
     const quizDetail = await Quiz.findById(quizId).select('name');
-
+    
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
 
     const review = quiz.questions.map((q, index) => ({
@@ -415,8 +415,8 @@ exports.deleteUserTakenQuiz = async (req, res) => {
 exports.quizResult = async (req, res) => {
   try {
     const { quizId } = req.params;
-    const userId = req.user.id; // Ensure userId exists
-
+   const userId = req.user.id; // Ensure userId exists
+   
 
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized, user not found in request" });
@@ -578,8 +578,8 @@ Output the quiz strictly in this JSON format (raw JSON only):
       instructions,
       totalQuestions: createdQuestions.length,
       questions: createdQuestions.map(q => q._id),
-      startTime: new Date(startTime).toISOString(),
-      endTime: new Date(endTime).toISOString(),
+      startTime: new Date(startTime),
+      endTime: new Date(endTime),
     });
 
     await quiz.save();

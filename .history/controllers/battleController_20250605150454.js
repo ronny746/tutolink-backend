@@ -387,21 +387,53 @@ exports.getAllBattlesUser = async (req, res) => {
 };
 exports.getAllBattles = async (req, res) => {
   try {
-    const battles = await Battle.find();
+    // Ensure req.user exists (this depends on your authentication logic)
+   
 
-    res.status(200).json({
-      success: true,
-      battles,
+    const battles = await Battle.find({ 
+      status: "Upcoming" // Filter only the battles that are 'Upcoming'
+    })
+      .populate('quizId', 'name')  // Populate quiz title (Maths Basics, etc.)
+      .populate('createdBy', 'username')  // Populate creator's username (Rohit)
+      .populate('participants', '_id')  // Populate participants' ids for easy comparison
+
+    if (!battles || battles.length === 0) {
+      return res.status(404).json({ message: "No upcoming battles found" });
+    }
+
+    // Function to format time in hh:mm:ss format
+    const formatTimeRemaining = (startTime) => {
+      const now = new Date();
+      const remainingTime = new Date(startTime) - now;
+
+      if (remainingTime <= 0) return 'Already started'; // If the battle already started
+
+      const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+      return `${hours}h ${minutes}m ${seconds}s`;
+    };
+
+    // Map over the battles and structure the response as per your requirement
+    const battleDetails = battles.map(battle => {
+      const participantsIds = battle.participants.map(p => p._id.toString());
+      return {
+        title: battle.quizId ? battle.quizId.name : 'N/A',
+        code: battle.battleCode,
+        time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
+        creator: battle.createdBy ? battle.createdBy.username : 'Unknown',
+        participants: battle.participants.length,
+        joined: participantsIds.includes(req.user._id.toString()),  // Ensure user is part of the battle
+      };
     });
+
+    res.status(200).json({ success: true, battles: battleDetails });
   } catch (error) {
-    console.error("❌ Error fetching battles:", error.message);
-    res.status(500).json({
-      error: "Error fetching battles",
-      details: error.message,
-    });
+    console.error(error);  // Add logging for debugging purposes
+    res.status(500).json({ error: "Error fetching battles", details: error.message });
   }
 };
-
 
 // Asynchronous checkAnswer function that fetches the question from the database
 async function checkAnswer(questionId, providedAnswer) {

@@ -26,7 +26,7 @@ const { createSubject, getAllSubjects, getSubjects, deleteSubject, updateSubject
 router.post("/create", upload.single("file"), createSubject);
 router.get("/", getAllSubjects);
 router.get("/by-id", getSubjects);
-router.get("/getcoursewise", getSubjectsByClassOrCourse);
+router.get("/getcoursewise/:classOrCourseId", getSubjectsByClassOrCourse);
 router.delete("/delete", deleteSubject);
 router.put("/update", updateSubject);
 router.post("/upload-image", upload.single("file"), uploadImage);

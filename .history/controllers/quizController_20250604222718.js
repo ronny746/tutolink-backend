@@ -416,7 +416,8 @@ exports.quizResult = async (req, res) => {
   try {
     const { quizId } = req.params;
     const userId = req.user.id; // Ensure userId exists
-
+    console.log("User ID:", userId);
+    console.log("Quiz ID:", quizId);
 
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized, user not found in request" });
@@ -424,15 +425,14 @@ exports.quizResult = async (req, res) => {
 
     // Fetch user attempt from quizzesTaken array
     const user = await User.findById(userId).populate("quizzesTaken.quizId");
-
+    console.log("User Data:", user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
     // Find the specific quiz attempt
-    const attempt = user.quizzesTaken.find(q => q.quizId?._id?.toString() === quizId);
-
-
+    const attempt = user.quizzesTaken.find(q => q.quizId._id.toString() === quizId);
+    console.log("User Data:", attempt);
     if (!attempt) {
       return res.status(404).json({ error: "Quiz attempt not found" });
     }
@@ -487,64 +487,54 @@ exports.quizResult = async (req, res) => {
 
 exports.createQuizForBattle = async (req, res) => {
   try {
-    const {
-      subject,
-      subjectId,
-      topic,
-      numberOfQuestions,
-      difficulty,
-      startTime
-    } = req.body;
+    const { subject, topic, numberOfQuestions, difficulty, startTime } = req.body;
 
-    if (!subject || !subjectId || !topic || !numberOfQuestions || !difficulty || !startTime) {
+    if (!subject || !topic || !numberOfQuestions || !difficulty || !startTime) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const endTime = new Date(
-      new Date(startTime).getTime() + numberOfQuestions * 2 * 60000
-    ).toISOString();
-
     const prompt = `
-Generate a quiz on the topic "${topic}" under the subject "${subject}".
-Difficulty: "${difficulty}". Total Questions: ${numberOfQuestions}.
-Output the quiz strictly in this JSON format (raw JSON only):
+    Generate a quiz on the topic "${topic}" under the subject "${subject}".
+    Difficulty: "${difficulty}". Total Questions: ${numberOfQuestions}.
+    Output the quiz strictly in this JSON format:
 
-{
-  "subjectId": "${subjectId}",
-  "name": "${topic}",
-  "totalPoints": ${numberOfQuestions * 10},
-  "rating": 0,
-  "duration": ${numberOfQuestions * 2},
-  "participants": 0,
-  "averageScore": 0,
-  "startTime": "${startTime}",
-  "endTime": "${endTime}",
-  "instructions": [
-    "Test your knowledge on ${topic}!",
-    "No negative marking."
-  ],
-  "questions": [
     {
-      "question": "Sample question?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": "A",
-      "explanation": "Short explanation.",
-      "time": 2
+      "subjectId": "random_id_here",
+      "name": "${topic}",
+      "totalPoints": ${numberOfQuestions * 10},
+      "rating": 0,
+      "duration": ${numberOfQuestions * 2},
+      "participants": 0,
+      "averageScore": 0,
+      "startTime": "${startTime}",
+      "endTime": "${new Date(new Date(startTime).getTime() + numberOfQuestions * 2 * 60000).toISOString()}",
+      "instructions": [
+        "Test your knowledge on ${topic}!",
+        "No negative marking."
+      ],
+      "questions": [
+        {
+          "question": "Sample question?",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "correctAnswer": "A",
+          "explanation": "Short explanation.",
+          "time": "2"
+        }
+      ]
     }
-  ]
-}
-`;
+
+    Return raw JSON only.
+    `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = await response.text();
 
-    // Remove code block markers if present
     text = text.replace(/```json|```/g, "").trim();
-
     const quizData = JSON.parse(text);
 
     const {
+      subjectId,
       name,
       totalPoints,
       rating,
@@ -555,7 +545,7 @@ Output the quiz strictly in this JSON format (raw JSON only):
       questions
     } = quizData;
 
-    // Save all questions
+    // 🔽 Save all questions first
     const createdQuestions = await Question.insertMany(
       questions.map(q => ({
         question: q.question,
@@ -566,10 +556,9 @@ Output the quiz strictly in this JSON format (raw JSON only):
       }))
     );
 
-    // Save quiz
+    // 🔽 Then save the quiz
     const quiz = new Quiz({
       name,
-      subjectId,
       totalPoints,
       rating,
       duration,
@@ -577,23 +566,16 @@ Output the quiz strictly in this JSON format (raw JSON only):
       averageScore,
       instructions,
       totalQuestions: createdQuestions.length,
-      questions: createdQuestions.map(q => q._id),
-      startTime: new Date(startTime).toISOString(),
-      endTime: new Date(endTime).toISOString(),
+      questions: createdQuestions.map(q => q._id)
     });
 
     await quiz.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Quiz generated & saved",
-      quiz
-    });
+    res.status(201).json({ success: true, message: "Quiz generated & saved", quiz });
 
   } catch (error) {
-    console.error("❌ Error in createQuizForBattle:", error.message);
+    console.error("❌ Error in openAiQuestions:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { uploadQuiz, createQuizForBattle, getQuizzes, updateQuiz, getallQuizzes, deleteQuiz, getQuizById, submitQuiz, getQuizReview, deleteUserTakenQuiz, quizResult , getPDFReview } = require("../controllers/quizController");
+const { uploadQuiz, createQuizForBattle, getQuizzes, updateQuiz, getallQuizzes, deleteQuiz, getQuizById, submitQuiz, getQuizReview, deleteUserTakenQuiz, quizResult,getPDFReview } = require("../controllers/quizController");
 const { verifyToken } = require("../config/authMiddleware"); // Middleware import karo
 router.post("/upload", uploadQuiz);
 router.post("/createForBattle", createQuizForBattle);

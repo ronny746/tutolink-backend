@@ -5,7 +5,6 @@ const { verifyToken } = require("../config/authMiddleware");
 
 // Create a New Battle
 router.post("/create", battleController.createBattle);
-router.get("/", battleController.getAllBattles);
 
 // Join a Battle
 router.post("/join", battleController.joinBattle);
@@ -30,6 +29,6 @@ router.get("/history", verifyToken, battleController.getBattleHistory);
 
 // Leave a Battle
 router.post("/leave", battleController.leaveBattle);
-router.get("/getallbattle",verifyToken, battleController.getAllBattlesUser);
+router.get("/getallbattle",verifyToken, battleController.getAllBattles);
 
 module.exports = router;

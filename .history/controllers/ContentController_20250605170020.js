@@ -241,7 +241,9 @@ exports.getHome = async (req, res) => {
       .slice(0, 10);
 
     // 🔴 Ended Quizzes
-   
+    const endedQuizzes = allQuizzes
+      .filter(quiz => quiz.status === "Ended")
+      .slice(0, 10);
     // 🟢 7. User Stats (Rank & Points)
     const higherRankedUsers = await User.countDocuments({ points: { $gt: user.points } });
     const userRank = higherRankedUsers + 1; // Rank starts from 1

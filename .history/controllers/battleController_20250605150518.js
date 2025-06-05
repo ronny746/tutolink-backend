@@ -385,22 +385,6 @@ exports.getAllBattlesUser = async (req, res) => {
     res.status(500).json({ error: "Error fetching battles", details: error.message });
   }
 };
-exports.getAllBattles = async (req, res) => {
-  try {
-    const battles = await Battle.find();
-
-    res.status(200).json({
-      success: true,
-      battles,
-    });
-  } catch (error) {
-    console.error("❌ Error fetching battles:", error.message);
-    res.status(500).json({
-      error: "Error fetching battles",
-      details: error.message,
-    });
-  }
-};
 
 
 // Asynchronous checkAnswer function that fetches the question from the database

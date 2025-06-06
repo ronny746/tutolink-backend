@@ -56,9 +56,8 @@ app.get("/request", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "contact.html"));
 });
 
-app.get("/.well-known/assetlinks.json", (req, res) => {
-  res.sendFile(path.join(__dirname, ".well-known", "assetlinks.json"));
-});
+
+
 app.listen(process.env.PORT, () => console.log("Server running on port 3000"));
 
 

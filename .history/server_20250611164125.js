@@ -16,7 +16,7 @@ const battleRoutes = require("./routes/battleRoutes");
 const dailyCheckInRoutes = require("./routes/dailyCheckInRoutes");
 const trackRoutes = require("./routes/trackRoutes");
 const contactRoutes = require("./routes/contactRoutes");
-const settingRoutes = require('./routes/settingRoutes');
+const settingRoutes = require('./routes/');
 
 require("./sockets/scheduler");
 

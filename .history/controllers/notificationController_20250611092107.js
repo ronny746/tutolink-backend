@@ -5,8 +5,8 @@ const User = require("../models/User");
 const { GoogleAuth } = require('google-auth-library');
 const axios = require('axios');
 
-const SERVICE_ACCOUNT_PATH = '/Users/rohit/backend/tutolink-backend/config/firebase-service-account.json';
-const PROJECT_ID = 'news-admin-997b0'; // 🔁 Replace with your actual Firebase project ID
+const SERVICE_ACCOUNT_PATH = '/Users/rohit/backend/tutolink-backend/config/pp.json';
+const PROJECT_ID = 'your-project-id'; // 🔁 Replace with your actual Firebase project ID
 
 async function getAccessToken() {
   const auth = new GoogleAuth({

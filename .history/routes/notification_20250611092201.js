@@ -7,6 +7,6 @@ const router = express.Router();
 router.get("/", verifyToken, getNotifications);
 router.post("/markasRead", verifyToken, markAsRead);
 router.post("/notifiToall", sendNotificationToAll);
-router.post("/push", sendPushNotification);
+router.post("/push", sendNotificationToAll);
 
 module.exports = router;

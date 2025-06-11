@@ -48,8 +48,8 @@ const UserSchema = new mongoose.Schema({
 
   subscriptionStatus: { type: String, enum: ["Free", "Premium"], default: "Free" },
   dailyScore: { type: Number, default: 0 },
-  lastCheckIn: { type: Date, default: null },
-  fcmToken: { type: String }, // For push notifications
+  lastCheckIn: { type: Date, default: null }
+  fcm
 });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -1,23 +1,5 @@
 const Notification = require("../models/notification");
 const User = require("../models/User");
-
-
-const { GoogleAuth } = require('google-auth-library');
-const axios = require('axios');
-
-const SERVICE_ACCOUNT_PATH = '/Users/rohit/backend/tutolink-backend/config/firebase-service-account.json';
-const PROJECT_ID = 'news-admin-997b0'; // 🔁 Replace with your actual Firebase project ID
-
-async function getAccessToken() {
-  const auth = new GoogleAuth({
-    keyFile: SERVICE_ACCOUNT_PATH,
-    scopes: 'https://www.googleapis.com/auth/firebase.messaging',
-  });
-
-  const client = await auth.getClient();
-  const tokenResponse = await client.getAccessToken();
-  return tokenResponse.token;
-}
 exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user.id; // 🟢 Assume user is authenticated
@@ -99,33 +81,5 @@ exports.sendNotificationToAll = async (req, res) => {
       message: "Error sending notifications",
       details: error.message
     });
-  }
-};
-
-exports.sendPushNotification = async (req, res) => {
-  const { message } = req.body;
-
-  if (!message || !message.token) {
-    return res.status(400).json({ error: 'message.token is required' });
-  }
-
-  try {
-    const accessToken = await getAccessToken();
-
-    const response = await axios.post(
-      `https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`,
-      { message },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    res.status(200).json({ success: true, fcmResponse: response.data });
-  } catch (error) {
-    console.error('FCM error:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to send FCM message' });
   }
 };

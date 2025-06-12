@@ -231,7 +231,7 @@ exports.getUserPerformance = async (req, res) => {
 
 // In your controller (e.g., userController.js)
 
-
+const User = require("../models/User");
 
 exports.resetAllUsersData = async (req, res) => {
   try {

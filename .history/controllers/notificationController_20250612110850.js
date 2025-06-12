@@ -1,13 +1,11 @@
 const Notification = require("../models/notification");
 const User = require("../models/User");
 
-const path = require('path');
 
 const { GoogleAuth } = require('google-auth-library');
 const axios = require('axios');
 
-const SERVICE_ACCOUNT_PATH = path.join(__dirname, '../config/firebase-service-account.json');
-
+const SERVICE_ACCOUNT_PATH = '../config/firebase-service-account.json';
 // 🔁 Replace with your actual service account path
 const PROJECT_ID = 'news-admin-997b0'; // 🔁 Replace with your actual Firebase project ID
 

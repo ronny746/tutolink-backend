@@ -10,6 +10,6 @@ router.get("/getUserPerformance", verifyToken, getUserPerformance); // 🔒 Toke
 router.get("/", verifyToken, getUser); // 🔒 Token required
 router.put("/:id", verifyToken, updateUser); // 🔒 Token required
 router.delete("/:id", verifyToken, deleteUser); // 🔒 Token required
-router.post("/reset-all",verifyToken, resetAllUsersData);
+router.post("/reset-all",verifyToken, userController.resetAllUsersData);
 
 module.exports = router;

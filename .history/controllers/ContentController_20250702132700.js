@@ -277,21 +277,21 @@ exports.getHome = async (req, res) => {
         //   heading: "Featured Quizzes",
         //   items: quizzesWithColors
         // },
-        // ongoingQuizzes: { // 🟢 Ongoing Quizzes
-        //   type: "quizzes",
-        //   heading: "Ongoing Quizzes",
-        //   items: ongoingQuizzes
-        // },
-        // upcomingQuizzes: { // 🟢 Upcoming Quizzes
-        //   type: "quizzes",
-        //   heading: "Upcoming Quizzes",
-        //   items: upcomingQuizzes
-        // },
-        // latestContent: { // 🟢 Latest Content
-        //   type: "content",
-        //   heading: "Latest Content",
-        //   items: latestContent
-        // },
+        ongoingQuizzes: { // 🟢 Ongoing Quizzes
+          type: "quizzes",
+          heading: "Ongoing Quizzes",
+          items: ongoingQuizzes
+        },
+        upcomingQuizzes: { // 🟢 Upcoming Quizzes
+          type: "quizzes",
+          heading: "Upcoming Quizzes",
+          items: upcomingQuizzes
+        },
+        latestContent: { // 🟢 Latest Content
+          type: "content",
+          heading: "Latest Content",
+          items: latestContent
+        },
         userStats: { // 🟢 User Stats Section
           type: "stats",
           heading: "Your Stats",

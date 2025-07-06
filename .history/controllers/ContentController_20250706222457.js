@@ -267,11 +267,11 @@ exports.getHome = async (req, res) => {
           heading: "New content",
           items: mysliders
         },
-        // subjects: { // 🟢 Subjects Section
-        //   type: "subjects",
-        //   heading: "My Subjects",
-        //   items: subjectsWithColors
-        // },
+        subjects: { // 🟢 Subjects Section
+          type: "subjects",
+          heading: "My Subjects",
+          items: subjectsWithColors
+        },
         featuredQuizzes: { // 🟢 Featured Quizzes
           type: "quizzes",
           heading: "Featured Quizzes",
@@ -300,11 +300,11 @@ exports.getHome = async (req, res) => {
           lastCheckIn: user.lastCheckIn,
           unreadNotifications: unreadNotificationsCount
         },
-        // topRankedUsers: { // 🟢 Top Users Section
-        //   type: "leaderboard",
-        //   heading: "Top Rankers",
-        //   items: rankedUsers
-        // }
+        topRankedUsers: { // 🟢 Top Users Section
+          type: "leaderboard",
+          heading: "Top Rankers",
+          items: rankedUsers
+        }
       }
     });
 

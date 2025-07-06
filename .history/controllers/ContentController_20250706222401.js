@@ -164,8 +164,7 @@ exports.getHome = async (req, res) => {
     const [subjects, mysliders, featuredQuizzes, allQuizzes, latestContent, topRankedUsers] = await Promise.all([
       Subject.find({ classOrCourseId: user.classOrCourseId }, "name description iconUrl"), // 🟢 Filtered by user's category
       Slider.find().sort({ createdAt: -1 }),
-      Quiz.find({}, "name totalQuestions duration rating startTime instructions").sort({ rating: -1 }),
-      // Quiz.find({ classOrCourseId: user.classOrCourseId }, "name totalQuestions duration rating startTime instructions").sort({ rating: -1 }),
+      Quiz.find({ classOrCourseId: user.classOrCourseId }, "name totalQuestions duration rating startTime instructions").sort({ rating: -1 }),
       // Quiz.find({ classOrCourseId: user.classOrCourseId }).sort({ startTime: 1 }),
       Quiz.find().sort({ startTime: 1 }),
       Content.find({ classOrCourseId: user.classOrCourseId }, "title pdfUrl videoUrl").sort({ createdAt: -1 }),
@@ -267,16 +266,16 @@ exports.getHome = async (req, res) => {
           heading: "New content",
           items: mysliders
         },
-        // subjects: { // 🟢 Subjects Section
-        //   type: "subjects",
-        //   heading: "My Subjects",
-        //   items: subjectsWithColors
-        // },
-        featuredQuizzes: { // 🟢 Featured Quizzes
-          type: "quizzes",
-          heading: "Featured Quizzes",
-          items: quizzesWithColors
+        subjects: { // 🟢 Subjects Section
+          type: "subjects",
+          heading: "My Subjects",
+          items: subjectsWithColors
         },
+        // featuredQuizzes: { // 🟢 Featured Quizzes
+        //   type: "quizzes",
+        //   heading: "Featured Quizzes",
+        //   items: quizzesWithColors
+        // },
         // ongoingQuizzes: { // 🟢 Ongoing Quizzes
         //   type: "quizzes",
         //   heading: "Ongoing Quizzes",
@@ -300,11 +299,11 @@ exports.getHome = async (req, res) => {
           lastCheckIn: user.lastCheckIn,
           unreadNotifications: unreadNotificationsCount
         },
-        // topRankedUsers: { // 🟢 Top Users Section
-        //   type: "leaderboard",
-        //   heading: "Top Rankers",
-        //   items: rankedUsers
-        // }
+        topRankedUsers: { // 🟢 Top Users Section
+          type: "leaderboard",
+          heading: "Top Rankers",
+          items: rankedUsers
+        }
       }
     });
 

@@ -300,11 +300,11 @@ exports.getHome = async (req, res) => {
           lastCheckIn: user.lastCheckIn,
           unreadNotifications: unreadNotificationsCount
         },
-        // topRankedUsers: { // 🟢 Top Users Section
-        //   type: "leaderboard",
-        //   heading: "Top Rankers",
-        //   items: rankedUsers
-        // }
+        topRankedUsers: { // 🟢 Top Users Section
+          type: "leaderboard",
+          heading: "Top Rankers",
+          items: rankedUsers
+        }
       }
     });
 

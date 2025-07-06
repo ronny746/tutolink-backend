@@ -287,11 +287,11 @@ exports.getHome = async (req, res) => {
         //   heading: "Upcoming Quizzes",
         //   items: upcomingQuizzes
         // },
-        // latestContent: { // 🟢 Latest Content
-        //   type: "content",
-        //   heading: "Latest Content",
-        //   items: latestContent
-        // },
+        latestContent: { // 🟢 Latest Content
+          type: "content",
+          heading: "Latest Content",
+          items: latestContent
+        },
         userStats: { // 🟢 User Stats Section
           type: "stats",
           heading: "Your Stats",

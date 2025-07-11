@@ -114,31 +114,79 @@ exports.getQuizzes = async (req, res) => {
 
 
 
+// exports.updateQuiz = async (req, res) => {
+//   try {
+//     const { quizId } = req.query; // Get quiz ID from URL
+//     const updateData = req.body; // Get updated fields from request body
+
+//     // Find and update the quiz
+//     const updatedQuiz = await Quiz.findByIdAndUpdate(
+//       quizId,
+//       { $set: updateData },
+//       { new: true, runValidators: true }
+//     );
+
+//     // If quiz not found
+//     if (!updatedQuiz) {
+//       return res.status(404).json({ error: "Quiz not found" });
+//     }
+
+//     res.json({
+//       message: "Quiz updated successfully",
+//       quiz: updatedQuiz
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: "Error updating quiz", details: error.message });
+//   }
+// };
+
 exports.updateQuiz = async (req, res) => {
   try {
-    const { quizId } = req.query; // Get quiz ID from URL
-    const updateData = req.body; // Get updated fields from request body
+    const { quizId } = req.query;
+    const {
+      name,
+      totalPoints,
+      duration,
+      rating,
+      averageScore,
+      participants,
+      instructions,
+      questions, // optional: full updated question array
+    } = req.body;
 
-    // Find and update the quiz
-    const updatedQuiz = await Quiz.findByIdAndUpdate(
-      quizId,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    );
-
-    // If quiz not found
-    if (!updatedQuiz) {
+    const quiz = await Quiz.findById(id);
+    if (!quiz) {
       return res.status(404).json({ error: "Quiz not found" });
     }
 
-    res.json({
-      message: "Quiz updated successfully",
-      quiz: updatedQuiz
-    });
+    // ✅ Update quiz fields if present
+    if (name !== undefined) quiz.name = name;
+    if (totalPoints !== undefined) quiz.totalPoints = totalPoints;
+    if (duration !== undefined) quiz.duration = duration;
+    if (rating !== undefined) quiz.rating = rating;
+    if (averageScore !== undefined) quiz.averageScore = averageScore;
+    if (participants !== undefined) quiz.participants = participants;
+    if (instructions !== undefined) quiz.instructions = instructions;
+
+    // ✅ If questions provided, delete old and insert new
+    if (Array.isArray(questions)) {
+      // Delete old questions
+      await Question.deleteMany({ _id: { $in: quiz.questions } });
+
+      // Insert new ones
+      const newQuestions = await Question.insertMany(questions);
+      quiz.questions = newQuestions.map(q => q._id);
+      quiz.totalQuestions = newQuestions.length;
+    }
+
+    await quiz.save();
+
+    res.status(200).json({ message: "Quiz updated successfully", quiz });
   } catch (error) {
-    res.status(500).json({ error: "Error updating quiz", details: error.message });
+    res.status(500).json({ error: "Failed to update quiz", details: error.message });
   }
 };
+
 
 
 exports.getallQuizzes = async (req, res) => {

@@ -13,7 +13,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 // ✅ Upload Quiz with Multiple Questions
 
-
+const Subject = require('../models/Subject'); // make sure the Subject model is imported
 
 exports.uploadQuiz = async (req, res) => {
   try {

@@ -5,7 +5,7 @@ const User = require("../models/User");
 const PDFDocument = require('pdfkit');
 const moment = require('moment');
 const fs = require('fs');
-
+const Subject = require('../models/Subject');
 const path = require('path');
 const apiKey = 'AIzaSyBNGgBHfErE0yfoiIklRClppDC1IOeYgRQ';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -13,7 +13,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 // ✅ Upload Quiz with Multiple Questions
 
-
+ // make sure the Subject model is imported
 
 exports.uploadQuiz = async (req, res) => {
   try {

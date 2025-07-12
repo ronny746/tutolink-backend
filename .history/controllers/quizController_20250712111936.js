@@ -57,8 +57,7 @@ exports.uploadQuiz = async (req, res) => {
       participants,
       averageScore,
       instructions,
-      type,
-      startTime
+      type
     });
 
     await quiz.save();

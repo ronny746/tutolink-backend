@@ -26,9 +26,7 @@ exports.uploadQuiz = async (req, res) => {
       duration,
       participants,
       averageScore,
-      instructions,
-      type,
-      startTime
+      instructions
     } = req.body;
 
     if (!subjectId || !Array.isArray(questions) || questions.length === 0) {
@@ -47,6 +45,7 @@ exports.uploadQuiz = async (req, res) => {
     // ✅ Create Quiz
     const quiz = new Quiz({
       subjectId,
+      categoryId,
       classOrCourseId: subject.classOrCourseId, // fetched from subject
       questions: createdQuestions.map(q => q._id),
       name,
@@ -56,9 +55,7 @@ exports.uploadQuiz = async (req, res) => {
       duration,
       participants,
       averageScore,
-      instructions,
-      type,
-      startTime
+      instructions
     });
 
     await quiz.save();

@@ -26,9 +26,7 @@ exports.uploadQuiz = async (req, res) => {
       duration,
       participants,
       averageScore,
-      instructions,
-      type,
-      startTime
+      instructions
     } = req.body;
 
     if (!subjectId || !Array.isArray(questions) || questions.length === 0) {
@@ -56,9 +54,7 @@ exports.uploadQuiz = async (req, res) => {
       duration,
       participants,
       averageScore,
-      instructions,
-      type,
-      startTime
+      instructions
     });
 
     await quiz.save();

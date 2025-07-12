@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const QuizSchema = new mongoose.Schema({
   subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "Subject", required: false },
   classOrCourseId: { type: mongoose.Schema.Types.ObjectId, ref: "ClassOrCourse", required: false },
-  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: false },
   questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }], // References to multiple questions
   name: { type: String, required: true }, // Total points for quiz
   totalPoints: { type: Number, default: 0 }, // Total points for quiz
@@ -16,6 +15,7 @@ const QuizSchema = new mongoose.Schema({
   averageScore: { type: Number, default: 0 }, // Average score of all participants
   instructions: [{ type: String, required: false }], // List of instructions
   startTime: { type: String, required: false },
+  endTime: { type: String, required: false },
   endTime: { type: String, required: false },
   status: { type: String, enum: ["Upcoming", "Live", "Ended"], default: "Upcoming" },
   createdAt: { type: Date, default: Date.now }

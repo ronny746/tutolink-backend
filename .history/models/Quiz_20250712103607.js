@@ -16,6 +16,7 @@ const QuizSchema = new mongoose.Schema({
   instructions: [{ type: String, required: false }], // List of instructions
   startTime: { type: String, required: false },
   endTime: { type: String, required: false },
+  type: { type: String, required: false },
   status: { type: String, enum: ["Upcoming", "Live", "Ended"], default: "Upcoming" },
   createdAt: { type: Date, default: Date.now }
 });

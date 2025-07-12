@@ -13,26 +13,36 @@ exports.getAdminDashboard = async (req, res) => {
       totalSubjects,
       totalQuizzes,
       totalCourses,
+      liveQuizzes,
       newUsersThisWeek,
-      mostActiveQuizzesDocs,
-      mostActiveQuiz,
+      mostActiveQuizDoc,
       topUsers
     ] = await Promise.all([
       User.countDocuments(),
       Subject.countDocuments(),
       Quiz.countDocuments(),
       Course.countDocuments(),
+      Quiz.find({ status: 'Live' }).sort({ updatedAt: -1 }),
       User.countDocuments({ createdAt: { $gte: oneWeekAgo } }),
-      Quiz.find({}).sort({ participants: -1 }).limit(5),
       Quiz.findOne().sort({ participants: -1 }),
       User.find().sort({ averageScore: -1 }).limit(3),
     ]);
 
-    const mostActiveQuizzes = mostActiveQuizzesDocs.map(quiz => ({
-      name: quiz.name,
+    const liveQuizList = liveQuizzes.map((quiz) => ({
+      id: quiz._id,
+      title: quiz.name,
       subjectId: quiz.subjectId,
-      participants: quiz.participants || 0,
+      classOrCourseId: quiz.classOrCourseId,
+      totalPoints: quiz.totalPoints,
+      totalQuestions: quiz.totalQuestions,
       duration: quiz.duration,
+      participants: quiz.participants || 0,
+      averageScore: quiz.averageScore,
+      instructions: quiz.instructions || [],
+      startTime: quiz.startTime,
+      endTime: quiz.endTime,
+      status: quiz.status,
+      createdAt: quiz.createdAt,
     }));
 
     const topPerformers = topUsers.map((user, index) => ({
@@ -40,21 +50,26 @@ exports.getAdminDashboard = async (req, res) => {
       name: user.name || 'Unknown',
       score: `${user.averageScore || 0} pts`,
     }));
+
     res.status(200).json({
       success: true,
       data: {
         stats: [
-          { label: 'Total Users', value: totalUsers, page: 4, icon: 'people' },
-          { label: 'Total Subjects', value: totalSubjects, page: 5, icon: 'menu_book' },
-          { label: 'Total Quizzes', value: totalQuizzes, page: 6, icon: 'quiz' },
-          { label: 'Total Courses', value: totalCourses, page: 7, icon: 'school' },
+          { label: 'Total Users', value: totalUsers },
+          { label: 'Total Subjects', value: totalSubjects },
+          { label: 'Total Quizzes', value: totalQuizzes },
+          { label: 'Total Courses', value: totalCourses },
         ],
-
-        mostActiveQuizzes,
-        mostActiveQuiz: mostActiveQuiz?.name
-          ? `Most Active Quiz: ${mostActiveQuiz?.name}`
-          : 'Most Active Quiz: N/A',
+        liveQuizzes: liveQuizList.length ? liveQuizList : [],
         newUsersThisWeek,
+        mostActiveQuiz: mostActiveQuizDoc
+          ? {
+              name: mostActiveQuizDoc.name,
+              subjectId: mostActiveQuizDoc.subjectId,
+              participants: mostActiveQuizDoc.participants || 0,
+              duration: mostActiveQuizDoc.duration,
+            }
+          : null,
         topPerformers,
       }
     });

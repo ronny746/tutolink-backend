@@ -15,7 +15,6 @@ exports.getAdminDashboard = async (req, res) => {
       totalCourses,
       newUsersThisWeek,
       mostActiveQuizzesDocs,
-      mostActiveQuiz,
       topUsers
     ] = await Promise.all([
       User.countDocuments(),
@@ -24,7 +23,7 @@ exports.getAdminDashboard = async (req, res) => {
       Course.countDocuments(),
       User.countDocuments({ createdAt: { $gte: oneWeekAgo } }),
       Quiz.find({}).sort({ participants: -1 }).limit(5),
-      Quiz.findOne().sort({ participants: -1 }),
+      Quiz.findOne().sort({ participants: -1 })
       User.find().sort({ averageScore: -1 }).limit(3),
     ]);
 
@@ -49,11 +48,8 @@ exports.getAdminDashboard = async (req, res) => {
           { label: 'Total Quizzes', value: totalQuizzes, page: 6, icon: 'quiz' },
           { label: 'Total Courses', value: totalCourses, page: 7, icon: 'school' },
         ],
-
+        
         mostActiveQuizzes,
-        mostActiveQuiz: mostActiveQuiz?.name
-          ? `Most Active Quiz: ${mostActiveQuiz?.name}`
-          : 'Most Active Quiz: N/A',
         newUsersThisWeek,
         topPerformers,
       }

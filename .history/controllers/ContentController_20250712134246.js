@@ -164,7 +164,7 @@ exports.getHome = async (req, res) => {
     const [subjects, mysliders, featuredQuizzes, allQuizzes, latestContent, topRankedUsers] = await Promise.all([
       Subject.find({ classOrCourseId: user.classOrCourseId }, "name description iconUrl"), // 🟢 Filtered by user's category
       Slider.find().sort({ createdAt: -1 }),
-      Quiz.find({}, "name totalQuestions type duration rating startTime instructions").sort({ rating: -1 }),
+      Quiz.find({}, "name totalQuestions, type, duration rating startTime instructions").sort({ rating: -1 }),
       // Quiz.find({ classOrCourseId: user.classOrCourseId }, "name totalQuestions duration rating startTime instructions").sort({ rating: -1 }),
       // Quiz.find({ classOrCourseId: user.classOrCourseId }).sort({ startTime: 1 }),
       Quiz.find().sort({ startTime: 1 }),

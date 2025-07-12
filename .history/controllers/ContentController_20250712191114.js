@@ -37,31 +37,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 //     res.status(500).json({ error: "Error uploading content", details: error.message });
 //   }
 // };
-exports.uploadContent = async (req, res) => {
- 
-  try {
-   
-    const { subjectId, pdfUrl, title } = req.body;
-    // const file = req.file;
 
-    // if (!file) return res.status(400).json({ error: "No file uploaded" });
-    // if (!subjectId || !title) return res.status(400).json({ error: "Subject ID and title are required" });
-
-    // const fileId = uuidv4();
-    // const fileUpload = bucket.file(`content/${fileId}-${file.originalname}`);
-
-    // await fileUpload.save(file.buffer, { contentType: file.mimetype });
-
-    // const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
-
-    const content = new Content({ subjectId, title, pdfUrl: pdfUrl });
-    await content.save();
-
-    res.json({ message: "Content uploaded successfully", content });
-  } catch (error) {
-    res.status(500).json({ error: "Error uploading content", details: error.message });
-  }
-};
 // ✅ Get All Content by Subject ID
 exports.getContent = async (req, res) => {
   try {

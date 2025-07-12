@@ -38,9 +38,8 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 //   }
 // };
 exports.uploadContent = async (req, res) => {
- 
   try {
-   
+    console.log(subjectId)
     const { subjectId, pdfUrl, title } = req.body;
     // const file = req.file;
 

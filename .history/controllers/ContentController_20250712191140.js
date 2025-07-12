@@ -38,9 +38,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 //   }
 // };
 exports.uploadContent = async (req, res) => {
- 
   try {
-   
     const { subjectId, pdfUrl, title } = req.body;
     // const file = req.file;
 
@@ -52,9 +50,9 @@ exports.uploadContent = async (req, res) => {
 
     // await fileUpload.save(file.buffer, { contentType: file.mimetype });
 
-    // const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
+    const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
 
-    const content = new Content({ subjectId, title, pdfUrl: pdfUrl });
+    const content = new Content({ subjectId, title, pdfUrl: url });
     await content.save();
 
     res.json({ message: "Content uploaded successfully", content });

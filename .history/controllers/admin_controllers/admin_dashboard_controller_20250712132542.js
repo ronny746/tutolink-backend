@@ -38,7 +38,7 @@ exports.getAdminDashboard = async (req, res) => {
     const topPerformers = topUsers.map((user, index) => ({
       place: `${index + 1}${['st', 'nd', 'rd'][index] || 'th'}`,
       name: user.name || 'Unknown',
-      score: `${user.points || 0} pts`,
+      score: `${user.p || 0} pts`,
     }));
     res.status(200).json({
       success: true,

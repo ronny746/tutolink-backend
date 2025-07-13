@@ -8,4 +8,6 @@ router.get('/', settingController.getSetting);
 // POST/PUT: Create or update setting
 router.post('/', settingController.upsertSetting);
 
+router.get('/get', settingController.getSetting);
+
 module.exports = router;

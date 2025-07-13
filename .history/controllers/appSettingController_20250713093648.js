@@ -1,5 +1,5 @@
 const Setting = require('../models/setting');
-const User = require('../models/User');
+
 // Create or Update Setting
 exports.upsertSetting = async (req, res) => {
   try {

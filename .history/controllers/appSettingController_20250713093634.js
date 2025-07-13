@@ -1,4 +1,4 @@
-const Setting = require('../models/Setting');
+const Setting = require('../models/setting');
 
 // Create or Update Setting
 exports.upsertSetting = async (req, res) => {
@@ -26,3 +26,13 @@ exports.getSetting = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+// Get users for noti
+exports.get = async (req, res) => {
+  try {
+    const setting = await Setting.findOne({});
+    res.status(200).json({ success: true, data: setting });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+

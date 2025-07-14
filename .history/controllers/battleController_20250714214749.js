@@ -336,79 +336,55 @@ exports.leaveBattle = async (req, res) => {
 
 exports.getAllBattlesUser = async (req, res) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ message: "Missing userId" });
+    // Ensure req.user exists (this depends on your authentication logic)
+    if (!req.user) {
+      return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const battles = await Battle.find()
-      .populate({
-        path: 'quizId',
-        select: 'name subjectId',
-        populate: {
-          path: 'subjectId',
-          select: 'name'
-        }
-      })
-      .populate('createdBy', 'name')
-      .populate('participants', '_id');
+    const battles = await Battle.find({ 
+      status: "Upcoming" // Filter only the battles that are 'Upcoming'
+    })
+      .populate('quizId', 'name')  // Populate quiz title (Maths Basics, etc.)
+      .populate('createdBy', 'username')  // Populate creator's username (Rohit)
+      .populate('participants', '_id')  // Populate participants' ids for easy comparison
 
     if (!battles || battles.length === 0) {
-      return res.status(404).json({ message: "No battles found" });
+      return res.status(404).json({ message: "No upcoming battles found" });
     }
 
+    // Function to format time in hh:mm:ss format
     const formatTimeRemaining = (startTime) => {
       const now = new Date();
-      const remaining = new Date(startTime) - now;
-      if (remaining <= 0) return 'Already started';
+      const remainingTime = new Date(startTime) - now;
 
-      const hours = Math.floor(remaining / (1000 * 60 * 60));
-      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      if (remainingTime <= 0) return 'Already started'; // If the battle already started
+
+      const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
       return `${hours}h ${minutes}m ${seconds}s`;
     };
 
-    const myCreatedBattles = [];
-    const joinedBattles = [];
-
-    battles.forEach(battle => {
-      const isCreator = battle.createdBy?._id?.toString() === userId;
-      const isParticipant = battle.participants.some(
-        p => p._id.toString() === userId
-      );
-
-      const battleInfo = {
-        title: battle.quizId?.name || 'N/A',
+    // Map over the battles and structure the response as per your requirement
+    const battleDetails = battles.map(battle => {
+      const participantsIds = battle.participants.map(p => p._id.toString());
+      return {
+        title: battle.quizId ? battle.quizId.name : 'N/A',
         code: battle.battleCode,
-        subject: battle.quizId?.subjectId.name || 'N/A',
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
-        creator: battle.createdBy?.name || 'Unknown',
+        creator: battle.createdBy ? battle.createdBy.username : 'Unknown',
         participants: battle.participants.length,
-        joined: isParticipant,
-        status: battle.status,
-        startTime:battle.startTime
+        joined: participantsIds.includes(req.user._id),  // Ensure user is part of the battle
       };
-
-      if (isCreator) {
-        myCreatedBattles.push(battleInfo);
-      } else if (isParticipant) {
-        joinedBattles.push(battleInfo);
-      }
     });
 
-    res.status(200).json({
-      success: true,
-      myCreatedBattles,
-      joinedBattles
-    });
-
+    res.status(200).json({ success: true, battles: battleDetails });
   } catch (error) {
-    console.error("Error fetching battles:", error);
-    res.status(500).json({ error: "Server error", details: error.message });
+    console.error(error);  // Add logging for debugging purposes
+    res.status(500).json({ error: "Error fetching battles", details: error.message });
   }
 };
-
 exports.getAllBattles = async (req, res) => {
   try {
     const battles = await Battle.find();

@@ -336,31 +336,26 @@ exports.leaveBattle = async (req, res) => {
 
 exports.getAllBattlesUser = async (req, res) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ message: "Missing userId" });
+    // Ensure user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: "User not authenticated" });
     }
 
-    const battles = await Battle.find()
-      .populate({
-        path: 'quizId',
-        select: 'name subjectId',
-        populate: {
-          path: 'subjectId',
-          select: 'name'
-        }
-      })
-      .populate('createdBy', 'name')
-      .populate('participants', '_id');
+    // Fetch all upcoming battles with relevant data
+    const battles = await Battle.find({ status: "Upcoming" })
+      .populate('quizId', 'name')                // Get quiz title
+      .populate('createdBy', 'username')         // Get creator's name
+      .populate('participants', '_id');          // Get participant IDs
 
     if (!battles || battles.length === 0) {
-      return res.status(404).json({ message: "No battles found" });
+      return res.status(404).json({ message: "No upcoming battles found" });
     }
 
+    // Function to format time remaining
     const formatTimeRemaining = (startTime) => {
       const now = new Date();
       const remaining = new Date(startTime) - now;
+
       if (remaining <= 0) return 'Already started';
 
       const hours = Math.floor(remaining / (1000 * 60 * 60));
@@ -369,39 +364,23 @@ exports.getAllBattlesUser = async (req, res) => {
       return `${hours}h ${minutes}m ${seconds}s`;
     };
 
-    const myCreatedBattles = [];
-    const joinedBattles = [];
-
-    battles.forEach(battle => {
-      const isCreator = battle.createdBy?._id?.toString() === userId;
-      const isParticipant = battle.participants.some(
-        p => p._id.toString() === userId
+    // Prepare response
+    const battleDetails = battles.map(battle => {
+      const joined = battle.participants.some(
+        p => p._id.toString() === req.user._id
       );
 
-      const battleInfo = {
+      return {
         title: battle.quizId?.name || 'N/A',
         code: battle.battleCode,
-        subject: battle.quizId?.subjectId.name || 'N/A',
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
-        creator: battle.createdBy?.name || 'Unknown',
+        creator: battle.createdBy?.username || 'Unknown',
         participants: battle.participants.length,
-        joined: isParticipant,
-        status: battle.status,
-        startTime:battle.startTime
+        joined: joined,
       };
-
-      if (isCreator) {
-        myCreatedBattles.push(battleInfo);
-      } else if (isParticipant) {
-        joinedBattles.push(battleInfo);
-      }
     });
 
-    res.status(200).json({
-      success: true,
-      myCreatedBattles,
-      joinedBattles
-    });
+    res.status(200).json({ success: true, battles: battleDetails });
 
   } catch (error) {
     console.error("Error fetching battles:", error);

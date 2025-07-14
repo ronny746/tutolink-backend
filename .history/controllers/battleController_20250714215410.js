@@ -336,21 +336,12 @@ exports.leaveBattle = async (req, res) => {
 
 exports.getAllBattlesUser = async (req, res) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ message: "Missing userId" });
+    if (!req.user) {
+      return res.status(401).json({ error: "User not authenticated" });
     }
 
     const battles = await Battle.find()
-      .populate({
-        path: 'quizId',
-        select: 'name subjectId',
-        populate: {
-          path: 'subjectId',
-          select: 'name'
-        }
-      })
+      .populate('quizId', 'name')
       .populate('createdBy', 'name')
       .populate('participants', '_id');
 
@@ -373,21 +364,19 @@ exports.getAllBattlesUser = async (req, res) => {
     const joinedBattles = [];
 
     battles.forEach(battle => {
-      const isCreator = battle.createdBy?._id?.toString() === userId;
+      const isCreator = battle.createdBy?._id?.toString() === req.user._id;
       const isParticipant = battle.participants.some(
-        p => p._id.toString() === userId
+        p => p._id.toString() === req.user._id
       );
 
       const battleInfo = {
         title: battle.quizId?.name || 'N/A',
         code: battle.battleCode,
-        subject: battle.quizId?.subjectId.name || 'N/A',
+        status: battle.status,
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
         creator: battle.createdBy?.name || 'Unknown',
         participants: battle.participants.length,
         joined: isParticipant,
-        status: battle.status,
-        startTime:battle.startTime
       };
 
       if (isCreator) {

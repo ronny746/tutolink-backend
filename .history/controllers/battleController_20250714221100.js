@@ -351,6 +351,7 @@ exports.getAllBattlesUser = async (req, res) => {
           select: 'name'
         }
       })
+
       .populate('createdBy', 'name')
       .populate('participants', '_id');
 
@@ -387,7 +388,6 @@ exports.getAllBattlesUser = async (req, res) => {
         participants: battle.participants.length,
         joined: isParticipant,
         status: battle.status,
-        startTime:battle.startTime
       };
 
       if (isCreator) {

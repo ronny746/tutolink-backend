@@ -387,7 +387,6 @@ exports.getAllBattlesUser = async (req, res) => {
         participants: battle.participants.length,
         joined: isParticipant,
         status: battle.status,
-        startTime:battle.startTime
       };
 
       if (isCreator) {

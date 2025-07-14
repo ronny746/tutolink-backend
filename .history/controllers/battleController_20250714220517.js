@@ -336,6 +336,7 @@ exports.leaveBattle = async (req, res) => {
 
 exports.getAllBattlesUser = async (req, res) => {
   try {
+    const { battleId } = req.query;
     const { userId } = req.query;
 
     if (!userId) {
@@ -343,14 +344,7 @@ exports.getAllBattlesUser = async (req, res) => {
     }
 
     const battles = await Battle.find()
-      .populate({
-        path: 'quizId',
-        select: 'name subjectId',
-        populate: {
-          path: 'subjectId',
-          select: 'name'
-        }
-      })
+      .populate('quizId', 'name')
       .populate('createdBy', 'name')
       .populate('participants', '_id');
 
@@ -381,13 +375,11 @@ exports.getAllBattlesUser = async (req, res) => {
       const battleInfo = {
         title: battle.quizId?.name || 'N/A',
         code: battle.battleCode,
-        subject: battle.quizId?.subjectId.name || 'N/A',
+        status: battle.status,
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
         creator: battle.createdBy?.name || 'Unknown',
         participants: battle.participants.length,
         joined: isParticipant,
-        status: battle.status,
-        startTime:battle.startTime
       };
 
       if (isCreator) {

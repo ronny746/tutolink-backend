@@ -16,7 +16,9 @@ const battleRoutes = require("./routes/battleRoutes");
 const dailyCheckInRoutes = require("./routes/dailyCheckInRoutes");
 const trackRoutes = require("./routes/trackRoutes");
 const contactRoutes = require("./routes/contactRoutes");
-const settingRoutes = require('./routes/');
+const settingRoutes = require('./routes/settingRoutes');
+
+const adminDashboardRoutes = require('./routes/admin_dashboard_routes');
 
 require("./sockets/scheduler");
 
@@ -48,6 +50,10 @@ app.use("/api/battle", battleRoutes);
 app.use("/api/dailyCheckIn", dailyCheckInRoutes);
 app.use("/api/track", trackRoutes);
 app.use("/api/contact", contactRoutes);
+
+const quoteRoutes = require('./routes/quoteRoutes');
+
+app.use('/api/admin', adminDashboardRoutes);
 
 app.use('/api/settings', settingRoutes);
 const path = require("path");

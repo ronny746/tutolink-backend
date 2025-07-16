@@ -18,9 +18,9 @@ const QuoteSchema = new mongoose.Schema({
     required: true,
   },
   quoteText: { type: String, required: true },
-  quoteTypeMode: {
+  type: {
     type: Number,
-    enum: [1, 2, 3, 4],
+    enum: [1, 2, 3, 4], // 1 = image, 2 = text, 3 = gif, 4 = text + image
     required: true,
   },
   image: { type: String }, // Image URL or path

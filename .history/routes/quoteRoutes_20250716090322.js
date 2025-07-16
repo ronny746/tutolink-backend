@@ -4,7 +4,7 @@ const quoteController = require('../controllers/admin_controllers/quotes_control
 
 router.post('/create', quoteController.createQuote);
 router.get('/', quoteController.getQuotes);
-router.get('/today', quoteController.getTodayQuote);
+router.get('/today', quoteController.getTodayQuotes);
 
 router.get('/enums', quoteController.getEnums); // optional but useful for dropdowns
 

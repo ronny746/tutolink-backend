@@ -10,9 +10,9 @@ const validStatuses = ['Draft', 'Published', 'Archived', 'Scheduled'];
 // Create Quote
 exports.createQuote = async (req, res) => {
   try {
-    const { quoteType, quoteText, quoteTypeMode, image, status, time } = req.body;
+    const { quoteType, quoteText,quoteTypeMode, image, status, time } = req.body;
 
-    if (!quoteType || !quoteText || !status || !time || quoteTypeMode === undefined) {
+    if (!quoteType || !quoteText || !status || !time) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -24,11 +24,7 @@ exports.createQuote = async (req, res) => {
       return res.status(400).json({ message: 'Invalid status' });
     }
 
-    if (![1, 2, 3, 4].includes(quoteTypeMode)) {
-      return res.status(400).json({ message: 'Invalid quoteTypeMode' });
-    }
-
-    const newQuote = new Quote({ quoteType, quoteText, quoteTypeMode, image, status, time });
+    const newQuote = new Quote({ quoteType, quoteText, image, status, time });
     await newQuote.save();
 
     res.status(201).json({ message: 'Quote created', quote: newQuote });
@@ -47,28 +43,23 @@ exports.getQuotes = async (req, res) => {
   }
 };
 
-exports.getTodayQuote = async (req, res) => {
+exports.getTodayQuotes = async (req, res) => {
   try {
     const start = new Date();
-    start.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0); // Today 00:00
 
     const end = new Date();
-    end.setHours(23, 59, 59, 999);
+    end.setHours(23, 59, 59, 999); // Today 23:59
 
-    const quote = await Quote.findOne({
+    const quotes = await Quote.find({
       time: { $gte: start, $lte: end }
     }).sort({ time: -1 });
 
-    if (!quote) {
-      return res.status(404).json({ message: 'No quote found for today' });
-    }
-
-    res.status(200).json({ quote });
+    res.status(200).json({ quotes });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-
 
 
 // Get Enums (for frontend dropdowns)

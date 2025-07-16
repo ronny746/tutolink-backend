@@ -47,28 +47,23 @@ exports.getQuotes = async (req, res) => {
   }
 };
 
-exports.getTodayQuote = async (req, res) => {
+exports.getTodayQuotes = async (req, res) => {
   try {
     const start = new Date();
-    start.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0); // Today 00:00
 
     const end = new Date();
-    end.setHours(23, 59, 59, 999);
+    end.setHours(23, 59, 59, 999); // Today 23:59
 
-    const quote = await Quote.findOne({
+    const quotes = await Quote.find({
       time: { $gte: start, $lte: end }
     }).sort({ time: -1 });
 
-    if (!quote) {
-      return res.status(404).json({ message: 'No quote found for today' });
-    }
-
-    res.status(200).json({ quote });
+    res.status(200).json({ quotes });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-
 
 
 // Get Enums (for frontend dropdowns)

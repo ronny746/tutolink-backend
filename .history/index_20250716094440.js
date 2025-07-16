@@ -68,6 +68,9 @@ app.get("/.well-known/assetlinks.json", (req, res) => {
 
 // Don't use app.listen in Vercel
 // app.listen(process.env.PORT, () => console.log("Server running"));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;
 module.exports.handler = serverless(app); // 👈 This is used by Vercel

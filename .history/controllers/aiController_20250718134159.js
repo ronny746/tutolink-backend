@@ -6,8 +6,7 @@ const Question = require("../models/questions");
 const Subject = require("../models/Subject");
 const Quiz = require("../models/Quiz");
 const User = require("../models/User");
-const Quote = require("../models/Quote");
-const Setting = require("../models/setting");
+const Quote =require("../models/User");
 
 const GEMINI_API_KEY = "AIzaSyBPTY0DG69w-GJAjC1LxiwtbzTVMIzACzw";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -20,7 +19,6 @@ const allModels = [
     { model: Subject, label: "Subject Information", priority: 1 },
     { model: Quiz, label: "Quiz Topics", priority: 1 },
     { model: Quote, label: "Quote", priority: 1 },
-    { model: Setting, label: "Setting", priority: 1 },
     
 
 ];

@@ -166,9 +166,13 @@ exports.getBattleDetails = async (req, res) => {
         }
       })
       .populate('createdBy', 'name')
-      .populate({
-        path: 'participants',
-        select: 'name'
+      .populate('participants', '_id', 'name',).populate({
+        path: 'quizId',
+        select: 'name subjectId',
+        populate: {
+          path: 'subjectId',
+          select: 'name'
+        }
       });
 
     if (!battle) {

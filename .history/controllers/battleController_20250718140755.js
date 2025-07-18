@@ -166,12 +166,9 @@ exports.getBattleDetails = async (req, res) => {
         }
       })
       .populate('createdBy', 'name')
-      .populate({
-        path: 'participants',
-        select: 'name'
-      });
+      .populate('participants', '_id');
 
-    if (!battle) {
+    if (!battles) {
       return res.status(404).json({ message: "Battle not found" });
     }
     res.status(200).json({ success: true, battle });
@@ -401,7 +398,7 @@ exports.getAllBattlesUser = async (req, res) => {
         participants: battle.participants.length,
         joined: isParticipant,
         status: battle.status,
-        startTime: battle.startTime,
+        startTime:battle.startTime,
         endTime: battle.endTime
       };
 

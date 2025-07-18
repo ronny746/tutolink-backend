@@ -20,7 +20,6 @@ const allModels = [
     { model: Subject, label: "Subject Information", priority: 1 },
     { model: Quiz, label: "Quiz Topics", priority: 1 },
     { model: Quote, label: "Quote", priority: 1 },
-    { model: Setting, label: "Setting", priority: 1 },
     
 
 ];

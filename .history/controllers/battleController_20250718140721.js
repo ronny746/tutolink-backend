@@ -156,7 +156,8 @@ exports.submitScore = async (req, res) => {
 exports.getBattleDetails = async (req, res) => {
   try {
     const { battleId } = req.query;
-    const battle = await Battle.findById(battleId)
+    const battle = await Battle.findById(battleId);
+    const battles = await Battle.findById(battleId)
       .populate({
         path: 'quizId',
         select: 'name subjectId',
@@ -166,10 +167,7 @@ exports.getBattleDetails = async (req, res) => {
         }
       })
       .populate('createdBy', 'name')
-      .populate({
-        path: 'participants',
-        select: 'name'
-      });
+      .populate('participants', '_id');
 
     if (!battle) {
       return res.status(404).json({ message: "Battle not found" });
@@ -401,7 +399,7 @@ exports.getAllBattlesUser = async (req, res) => {
         participants: battle.participants.length,
         joined: isParticipant,
         status: battle.status,
-        startTime: battle.startTime,
+        startTime:battle.startTime,
         endTime: battle.endTime
       };
 

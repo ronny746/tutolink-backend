@@ -31,13 +31,13 @@ app.use("/uploads", express.static("uploads"));
 
 
 mongoose.connect(
-  process.env.MONGO_URL,
+    process.env.MONGO_URL,
   // "mongodb://127.0.0.1:27017/tutolink",
   { useNewUrlParser: true, useUnifiedTopology: true }
 )
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
-
+ 
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -57,7 +57,6 @@ const aiRoutes = require("./routes/aiRoutes");
 
 app.use('/api/admin', adminDashboardRoutes);
 app.use('/api/quotes', quoteRoutes);
-app.use("/api", aiRoutes);
 
 app.use('/api/settings', settingRoutes);
 const path = require("path");

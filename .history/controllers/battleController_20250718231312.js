@@ -358,7 +358,7 @@ exports.getAllBattlesUser = async (req, res) => {
     const battles = await Battle.find()
       .populate({
         path: 'quizId',
-        select: 'name subjectId',
+        select: 'id name subjectId',
         populate: {
           path: 'subjectId',
           select: 'name'
@@ -393,9 +393,10 @@ exports.getAllBattlesUser = async (req, res) => {
 
       const battleInfo = {
         battleId: battle.id,
-        quizID: battle.quizId,
+        quizID: battle.quizId.id,
         title: battle.quizId?.name || 'N/A',
         code: battle.battleCode,
+        subject: battle.quizId?.subjectId.name || 'N/A',
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
         creator: battle.createdBy?.name || 'Unknown',
         participants: battle.participants.length,

@@ -396,6 +396,7 @@ exports.getAllBattlesUser = async (req, res) => {
         quizID: battle.quizId,
         title: battle.quizId?.name || 'N/A',
         code: battle.battleCode,
+        subject: battle.quizId?.subjectId.name || 'N/A',
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
         creator: battle.createdBy?.name || 'Unknown',
         participants: battle.participants.length,

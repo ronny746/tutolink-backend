@@ -393,9 +393,10 @@ exports.getAllBattlesUser = async (req, res) => {
 
       const battleInfo = {
         battleId: battle.id,
-        quizID: battle.quizId,
+        quizID: battle.quizId.,
         title: battle.quizId?.name || 'N/A',
         code: battle.battleCode,
+        subject: battle.quizId?.subjectId.name || 'N/A',
         time: battle.startTime ? formatTimeRemaining(battle.startTime) : 'N/A',
         creator: battle.createdBy?.name || 'Unknown',
         participants: battle.participants.length,

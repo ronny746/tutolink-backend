@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TutoLink – Quiz Battle Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #4b6cb7, #182848);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-weight: 400;
+      margin-bottom: 25px;
+    }
+
+    p {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+
+    .features {
+      max-width: 700px;
+      text-align: left;
+      margin-top: 30px;
+      padding: 0 10px;
+    }
+
+    .features li {
+      margin: 10px 0;
+      font-size: 1.05em;
+    }
+
+    .cta {
+      margin-top: 40px;
+      font-size: 1.1em;
+      padding: 0 10px;
+    }
+
+    .cta a {
+      color: #ffdd57;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+
+    .marquee {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      margin: 20px 0;
+    }
+
+    .marquee span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll 30s linear infinite;
+      font-size: 1.05em;
+      color: #ffdd57;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      .features li {
+        font-size: 1em;
+      }
+
+      .marquee span {
+        font-size: 1em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.6em;
+      }
+
+      h2 {
+        font-size: 1.1em;
+      }
+
+      .cta {
+        font-size: 1em;
+      }
+    }
+
+    /* Contact Us Button */
+    .contact-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ffdd57;
+      color: #182848;
+      padding: 12px 20px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 999;
+      transition: background-color 0.3s ease;
+    }
+
+    .contact-btn:hover {
+      background-color: #ffd700;
+    }
+
+  </style>
+</head>
+<body>
+  <script>
+    fetch('/api/track/visit', { method: 'POST' }).catch(err => console.error('Tracking failed', err));
+  </script>
+
+
+
+  <h1>🚀 Welcome to TutoLink</h1>
+  <h2>India's Smartest Quiz Battle Platform</h2>
+
+  <p>Challenge your friends. Test your knowledge. Climb the leaderboard.</p>
+
+  <ul class="features">
+    <li>🎯 AI-Generated Quiz Battles on Math, Science, GK & more</li>
+    <li>👥 Real-time multiplayer challenge system</li>
+    <li>🏆 Leaderboards, Live Scores & Dare-Based Rewards</li>
+    <li>📈 Progress tracking & answer insights</li>
+    <li>🧠 Designed for students, quiz lovers & educators</li>
+    <li>🤖 AI Buddy: Ask your doubts and get tailored answers instantly</li>
+  </ul>
+
+  <div class="cta">
+    📱 <strong>Launching soon on Android & iOS</strong>  
+    <br><br>
+    ✉️ Interested in early access? Contact us at  
+    <a href="mailto:officialtutolink@gmail.com">officialtutolink@gmail.com</a>
+  </div>
+
+  <div class="footer">
+    © 2025 TutoLink. All rights reserved.
+  </div>
+</body>
+</html>

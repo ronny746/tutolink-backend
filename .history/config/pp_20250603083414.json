@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ritco-mobile",
+  "private_key_id": "4177e52a1301429c27ba7b51a311a3a808d5b8f3",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD9542mM8DySjBv\nvSCo92en5PVHhm87tWMf8m9oxNift4Tt+u7KTx6grlcZWxBz+8zb1CBPwETTqjKf\naqisXHlqjWLTYJ9V0RjtRBEe5ZJ2v7SzaXo6E4UgRhMOI9Xjo+WJV+1UCX/JukBa\nsLTjRIJC1lIyQu3s+CeZNTG9le0MbasMDOvQzSFUNOG7hdw1uniHzeFK+hIEwaiW\nJM1krGEa4F4OZBhpN4R0TuDWktJbqaay7oF2IymPEesG7cXzLn6x+568zmpwfNpp\n31EqsddmwAFTVvS/2viE+dajFNjK17HWlFs21t2MCvYxuR66DdTM6bOkcKpgO1rO\nq9VAq71XAgMBAAECggEAIKLq6josyvgOUc6VrCJhCIu9m3wEQECIhUq8V1M2JRGJ\n3K0slISnAzBlsbSq4L21D2ys2pN0RWDTMPqcw8r/MFsMIO+Ci51c/uKI8NfBg9IQ\ngB9GvsBTlFptiJvCmogusQDEWND/xAZUz1N3bN8Zf03dMui3fIZJUMAtrJjg53/P\nub3cLYYmXKp4urfuHRLpBFUEswi3wtyWoYePFF0lVMfV849cyOp5FlhzFQNCb49K\ngVzDRkNqElBNMp+XGuveR1TrXesNlKLhtUi1QT7UStIB3EcQd3xUnsek7ezaXGqY\nUbtryJ+4SN9Rr9ya+cvwcOSxQUt9a5ab2T5tJl8DAQKBgQD/o8Q8GsRc5m1+b2ca\npHMVcjWQ18TfHCHW/LALYXupO+xLvcabLC/3t++hkV07N+AMKFKoTagi0cLzjerU\nmJmekcFE+bLOhujlfoDEDcnGsFkvD4+cuCr9p5SBENd48RXgKGeAcssCY1qRUMai\nnrmdVs1BY9bXhM4PqH8fFPy0UQKBgQD+QyklCGEknePpVswSX2jAdqhUGFx/n8z+\nJYuXl1yrqBh0rFnkjcQlYxoovN9NJa4RpdwiACnQ1kb1cFtiU3Dbpw88vsegyL5P\nHCl5mrdGJczJkJMsUDulb91R/5ZYhMJnjP93sfMH38RAb7UiM+qjA7Dsma4Kjvdm\nYelq5v+1JwKBgHG+hEnZ/xT20jE3kECiezJHpt3To51B/yyRMiNeNI+QQgtRXVUd\nzBoElXLmIv1+VwoRxvVr2Cvl+UA1HQ+K9o8/eycdkxmhnW6/YrvZBraJMKVn3xZ0\nO2yxa7ohrD37xyf90k+sw/dEDcAqmLcyuJPxU1KNAcLTLHx7FFTYGbiBAoGATxpL\n4aaSulaYwk5rnMesCjygL9GIbXgkyWia3iWMAieAvEOmj9F/FXaYe9YOzqyLVBg6\nvSU53Svc1Z0IATYeZWe6+NYNuzrY4jnLuXZl0GAQLyFYeC/Z7qU3wLv4ZT+gT6Dx\nFab6ChgWsUlPm/104RRT5bgGCmjiFSse+FA3e38CgYEAyHD67jQpOWB/lw7m78Am\ndKaKSoummjcdXYUDUb90WhYQC7gvxyXjJe+kGxqageO/XdoYWyIIHGVIjEvqrdbF\nU1jcQH6r2l291E5phzjWn8Gy791vRA2L6R6sa3PfuJFyA83wAoS2WkwoPO7uEcU0\nEjbuJnfF2c04BEI5FZsQHU4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-209mk@ritco-mobile.iam.gserviceaccount.com",
+  "client_id": "109239289451967485011",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-209mk%40ritco-mobile.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

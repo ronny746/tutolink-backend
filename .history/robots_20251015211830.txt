@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tutolink.in/sitemap.xml

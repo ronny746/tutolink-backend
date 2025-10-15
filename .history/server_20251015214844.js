@@ -31,13 +31,13 @@ app.use("/uploads", express.static("uploads"));
 
 
 mongoose.connect(
-    process.env.MONGO_URL,
+  process.env.MONGO_URL,
   // "mongodb://127.0.0.1:27017/tutolink",
   { useNewUrlParser: true, useUnifiedTopology: true }
 )
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
- 
+
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -51,17 +51,31 @@ app.use("/api/battle", battleRoutes);
 app.use("/api/dailyCheckIn", dailyCheckInRoutes);
 app.use("/api/track", trackRoutes);
 app.use("/api/contact", contactRoutes);
+const aiRoutes = require("./routes/aiRoutes");
 
 
 
 app.use('/api/admin', adminDashboardRoutes);
 app.use('/api/quotes', quoteRoutes);
+app.use("/api", aiRoutes);
 
 app.use('/api/settings', settingRoutes);
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/about", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "about.html"));
+});
+
+app.get("/blog", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "blog.html"));
+});
+
+app.get("/contact", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "contact.html"));
 });
 app.get("/request", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "contact.html"));

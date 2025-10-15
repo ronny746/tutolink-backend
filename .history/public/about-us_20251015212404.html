@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about TutoLink - India's premier quiz battle platform revolutionizing competitive learning through AI-powered technology.">
+  <title>About Us - TutoLink</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="canonical" href="https://tutolink.in/about.html">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a1a;
+      --bg-secondary: #1a1a3e;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent-primary: #ff6b6b;
+      --accent-secondary: #4ecdc4;
+      --card-bg: rgba(255, 255, 255, 0.02);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --glass-bg: rgba(10, 10, 26, 0.9);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 40px;
+      backdrop-filter: blur(20px);
+      background: var(--glass-bg);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 100px auto 50px;
+      padding: 0 40px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 0;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .section {
+      margin: 60px 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      background: var(--card-border);
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .card-text {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin: 50px 0;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 30px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--card-border);
+      margin-top: 80px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      .section-title {
+        font-size: 2rem;
+      }
+      .container {
+        padding: 0 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🎯</div>
+      TutoLink
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <section class="hero">
+      <h1 class="hero-title">About TutoLink</h1>
+      <p class="hero-text">
+        We're on a mission to revolutionize education in India by making learning competitive, engaging, and accessible to millions of students through cutting-edge AI technology.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Our Story</h2>
+      <p class="hero-text">
+        TutoLink was born from a simple observation: students learn better when they're engaged and challenged. We combined the thrill of competition with the power of AI to create India's first truly interactive quiz battle platform. Today, we're helping thousands of students across India turn study time into game time.
+      </p>
+    </section>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number">10K+</div>
+        <div class="stat-label">Active Students</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">50K+</div>
+        <div class="stat-label">Quizzes Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">100+</div>
+        <div class="stat-label">Partner Schools</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">4.8★</div>
+        <div class="stat-label">User Rating</div>
+      </div>
+    </div>
+
+    <section class="section">
+      <h2 class="section-title">Our Values</h2>
+      <div class="content-grid">
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h3 class="card-title">Student-First</h3>
+          <p class="card-text">Every decision we make puts student success and engagement at the center.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"></div>
+          <h3 class="card-title">Innovation</h3>
+          <p class="card-text">We constantly push boundaries to create the most engaging learning experience.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🤝</div>
+          <h3 class="card-title">Accessibility</h3>
+          <p class="card-text">Quality education should be available to every student, everywhere in India.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Why Choose TutoLink?</h2>
+      <div class="content-grid">
+        <div class="card">
+          <div class="card-icon">🧠</div>
+          <h3 class="card-title">AI-Powered</h3>
+          <p class="card-text">Our advanced AI creates personalized quizzes that adapt to your learning style and pace.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3 class="card-title">Real-Time Battles</h3>
+          <p class="card-text">Compete with friends and students nationwide in exciting real-time quiz battles.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3 class="card-title">Track Progress</h3>
+          <p class="card-text">Detailed analytics help you understand your strengths and areas for improvement.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 TutoLink. Empowering minds, one quiz at a time.</p>
+  </footer>
+</body>
+</html>

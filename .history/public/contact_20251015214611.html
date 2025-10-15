@@ -1,0 +1,134 @@
+<!-- FILE: contact.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact TutoLink - India's premier quiz battle platform.">
+  <title>Contact Us - TutoLink</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a1a;
+      --bg-secondary: #1a1a3e;
+      --bg-tertiary: #0f2847;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-tertiary: rgba(255, 255, 255, 0.5);
+      --accent-primary: #ff6b6b;
+      --accent-secondary: #4ecdc4;
+      --card-bg: rgba(255, 255, 255, 0.02);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --glass-bg: rgba(10, 10, 26, 0.9);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --bg-tertiary: #e8e8e8;
+      --text-primary: #0a0a1a;
+      --text-secondary: rgba(10, 10, 26, 0.7);
+      --text-tertiary: rgba(10, 10, 26, 0.5);
+      --card-bg: rgba(0, 0, 0, 0.02);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --glass-bg: rgba(255, 255, 255, 0.95);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);transition:background .3s,color .3s}
+    .bg-animation{position:fixed;inset:0;background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-secondary) 50%,var(--bg-tertiary) 100%);z-index:0}
+    .content-wrapper{position:relative;z-index:1}
+    .header{position:fixed;top:0;width:100%;padding:15px 40px;backdrop-filter:blur(20px);background:var(--glass-bg);border-bottom:1px solid var(--card-border);z-index:1000;display:flex;justify-content:space-between;align-items:center}
+    .logo{display:flex;align-items:center;font-size:1.5rem;font-weight:800;color:var(--text-primary);gap:10px;text-transform:uppercase;text-decoration:none}
+    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:10px}
+    .header-right{display:flex;align-items:center;gap:20px}
+    .nav-links{display:flex;gap:25px}
+    .nav-link{color:var(--text-secondary);text-decoration:none;font-weight:600;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px}
+    .nav-link:hover,.nav-link.active{color:var(--text-primary)}
+    .theme-toggle{width:40px;height:40px;border-radius:50%;background:var(--card-bg);border:1px solid var(--card-border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+    .container{max-width:1000px;margin:90px auto 0;padding:30px}
+    .section-title{font-size:1.6rem;font-weight:800;margin-bottom:16px;text-transform:uppercase}
+    .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:22px;margin-bottom:18px}
+    form .row{display:flex;gap:12px;margin-bottom:12px}
+    form input, form textarea{flex:1;padding:12px;border-radius:10px;border:1px solid var(--card-border);background:transparent;color:var(--text-primary);outline:none}
+    form textarea{min-height:120px;resize:vertical}
+    .btn{display:inline-block;padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));color:#fff;font-weight:700;border:none;cursor:pointer}
+    .footer{text-align:center;padding:28px 20px;color:var(--text-tertiary);border-top:1px solid var(--card-border);margin-top:30px}
+    @media(max-width:768px){.header{padding:12px 20px}.container{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+  <div class="content-wrapper">
+    <header class="header">
+      <a href="index.html" class="logo">
+        <div class="logo-icon"><img src="assets/logo.png" alt="TutoLink" onerror="this.parentElement.innerHTML='🎯'"></div>
+        TutoLink
+      </a>
+      <div class="header-right">
+        <nav class="nav-links" id="navLinks">
+          <a href="index" class="nav-link">Home</a>
+          <a href="about" class="nav-link">About</a>
+          <a href="blog" class="nav-link">Blog</a>
+          <a href="contact.html" class="nav-link active">Contact</a>
+        </nav>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="section">
+        <h1 class="section-title">Get in touch</h1>
+        <p style="color:var(--text-secondary);margin-bottom:14px">Have a question, partnership idea, or feedback? Drop a short message — we usually reply within a few business days.</p>
+
+        <div class="card">
+          <form action="#" onsubmit="event.preventDefault(); alert('Thanks! We would normally send this to the server.');">
+            <div class="row">
+              <input type="text" name="name" placeholder="Your name" required>
+              <input type="email" name="email" placeholder="Email" required>
+            </div>
+            <div style="margin-bottom:12px">
+              <input type="text" name="subject" placeholder="Subject (optional)">
+            </div>
+            <div style="margin-bottom:12px">
+              <textarea name="message" placeholder="Write a short message..." required></textarea>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end">
+              <button class="btn" type="submit">Send message</button>
+            </div>
+          </form>
+        </div>
+
+        <div style="margin-top:18px;color:var(--text-secondary);font-size:.95rem">
+          <p><strong>Email:</strong> geniusattechie@gmail.com</p>
+          <p><strong>Address:</strong> Online — India</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 TutoLink. Empowering minds, one quiz at a time.</p>
+    </footer>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    // const html = document.documentElement;
+    // const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    });
+  </script>
+</body>
+</html>
+
+
+

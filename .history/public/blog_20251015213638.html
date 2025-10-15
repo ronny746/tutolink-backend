@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TutoLink Blog - tips, updates and learning resources.">
+  <title>Blog - TutoLink</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* keep styles minimal and consistent with the main theme */
+    :root{--bg-primary:#0a0a1a;--bg-secondary:#1a1a3e;--bg-tertiary:#0f2847;--text-primary:#ffffff;--text-secondary:rgba(255,255,255,.7);--card-bg:rgba(255,255,255,.02);--card-border:rgba(255,255,255,.05);--accent-primary:#ff6b6b;--accent-secondary:#4ecdc4;--glass-bg:rgba(10,10,26,.9)}
+    [data-theme="light"]{--bg-primary:#fff;--bg-secondary:#f5f5f5;--bg-tertiary:#e8e8e8;--text-primary:#0a0a1a;--text-secondary:rgba(10,10,26,.7);--card-bg:rgba(0,0,0,.02);--card-border:rgba(0,0,0,.08);--glass-bg:rgba(255,255,255,.95)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);transition:background .3s,color .3s}
+    .bg-animation{position:fixed;inset:0;background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-secondary) 50%,var(--bg-tertiary) 100%);z-index:0}
+    .content-wrapper{position:relative;z-index:1}
+    .header{position:fixed;top:0;width:100%;padding:15px 40px;backdrop-filter:blur(20px);background:var(--glass-bg);border-bottom:1px solid var(--card-border);z-index:1000;display:flex;justify-content:space-between;align-items:center}
+    .logo{display:flex;align-items:center;font-size:1.5rem;font-weight:800;color:var(--text-primary);gap:10px;text-transform:uppercase;text-decoration:none}
+    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .nav-links{display:flex;gap:18px}
+    .nav-link{color:var(--text-secondary);text-decoration:none;font-weight:600;font-size:.9rem;text-transform:uppercase}
+    .nav-link.active{color:var(--text-primary)}
+    .container{max-width:1000px;margin:90px auto 0;padding:30px}
+    .section-title{font-size:1.6rem;font-weight:800;margin-bottom:16px;text-transform:uppercase}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .post{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;padding:18px}
+    .post h3{margin-bottom:8px}
+    .post p{color:var(--text-secondary);font-size:.95rem;line-height:1.5}
+    .read{display:inline-block;margin-top:10px;padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));color:#fff;font-weight:700;text-decoration:none}
+    .footer{text-align:center;padding:28px 20px;color:var(--text-secondary);border-top:1px solid var(--card-border);margin-top:30px}
+    @media(max-width:768px){.container{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+  <div class="content-wrapper">
+    <header class="header">
+      <a href="index.html" class="logo">
+        <div class="logo-icon"><img src="assets/logo.png" alt="TutoLink" onerror="this.parentElement.innerHTML='🎯'"></div>
+        TutoLink
+      </a>
+      <div style="display:flex;align-items:center;gap:18px">
+        <nav class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="blog.html" class="nav-link active">Blog</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section>
+        <h1 class="section-title">Latest posts</h1>
+        <p style="color:var(--text-secondary);margin-bottom:14px">Quick tips, product updates, and study hacks — short and useful.</p>
+
+        <div class="grid">
+          <article class="post">
+            <h3>3 Smart Ways to Improve Quiz Scores</h3>
+            <p>Use short daily battles, review wrong answers immediately, and focus on high-frequency topics to boost retention.</p>
+            <a href="#" class="read">Read more</a>
+          </article>
+
+          <article class="post">
+            <h3>How AI Personalizes Practice</h3>
+            <p>Adaptive quizzes identify weak spots and increase challenge gradually so you learn efficiently without burn-out.</p>
+            <a href="#" class="read">Read more</a>
+          </article>
+
+          <article class="post">
+            <h3>Study Routines That Actually Work</h3>
+            <p>Short focused sessions, mixed practice, and weekly reviews beat marathon cramming every time.</p>
+            <a href="#" class="read">Read more</a>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 TutoLink. Empowering minds, one quiz at a time.</p>
+    </footer>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    });
+  </script>
+</body>
+</html>

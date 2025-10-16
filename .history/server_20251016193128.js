@@ -31,8 +31,8 @@ app.use("/uploads", express.static("uploads"));
 
 
 mongoose.connect(
-  // process.env.MONGO_URL,
-  "mongodb://127.0.0.1:27017/tutolink",
+  process.env.MONGO_URL,
+  // "mongodb://127.0.0.1:27017/tutolink",
   { useNewUrlParser: true, useUnifiedTopology: true }
 )
   .then(() => console.log("MongoDB connected"))

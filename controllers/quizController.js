@@ -282,76 +282,168 @@ exports.getPDFReview = async (req, res) => {
       explanation: q.explanation
     }));
 
-    const doc = new PDFDocument({ margin: 40 });
-    const fileName = `review_${quizId}_${userId}.pdf`;
+    const doc = new PDFDocument({ 
+      margin: 30,
+      size: 'A4',
+      bufferPages: true
+    });
+    
+    const fileName = `TutoLink_Quiz_${quizId}_${Date.now()}.pdf`;
     const filePath = path.join(__dirname, `../public/reviews/${fileName}`);
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    // Simple text watermark function
+    const colors = {
+      primary: '#4A90E2',
+      success: '#50C878',
+      danger: '#E74C3C',
+      dark: '#2C3E50',
+      text: '#34495E'
+    };
+
+    // Watermark
     const drawWatermark = () => {
-      doc.fontSize(60)
-        .fillColor('grey', 0.2)
+      doc.save();
+      doc.fontSize(70).fillColor('#000000', 0.03)
         .rotate(-45, { origin: [doc.page.width / 2, doc.page.height / 2] })
-        .text('QUIZ REVIEW', doc.page.width / 4, doc.page.height / 2, {
-          align: 'center',
-          opacity: 0.1,
-          continued: false
-        })
-        .rotate(45, { origin: [doc.page.width / 2, doc.page.height / 2] }); // rotate back
+        .text('TUTOLINK', 0, doc.page.height / 2, { align: 'center', width: doc.page.width });
+      doc.restore();
+    };
+
+    // Header
+    const drawHeader = () => {
+      doc.rect(0, 0, doc.page.width, 4).fill(colors.primary);
     };
 
     drawWatermark();
-    doc.on('pageAdded', drawWatermark);
+    drawHeader();
 
     // Calculate score
     const totalQuestions = review.length;
     const correctAnswers = review.filter(item => item.selectedOption === item.correctAnswer).length;
-    const totalPoints = totalQuestions * 1;
-    const obtainedPoints = correctAnswers * 1;
+    const accuracy = ((correctAnswers / totalQuestions) * 100).toFixed(1);
 
-    // Header
-    doc
-      .fontSize(20)
-      .fillColor('#000')
-      .text(`Quiz Review Report`, { align: 'center' })
-      .moveDown(1);
+    // Company name
+    doc.fontSize(18).fillColor(colors.primary).font('Helvetica-Bold')
+      .text('TUTOLINK', 30, 18, { align: 'center', width: doc.page.width - 60 });
+    
+    // Title
+    doc.fontSize(13).fillColor(colors.dark)
+      .text('Quiz Performance Report', 30, 40, { align: 'center', width: doc.page.width - 60 });
 
-    doc
-      .font('Helvetica-Bold')
-      .fontSize(18)
-      .text(`Name: ${user.name}`)
-      .text(`Subject: ${quizDetail.name}`)
-      .text(`Score: ${obtainedPoints} / ${totalPoints}`)
-      .text(`Accuracy: ${((correctAnswers / totalQuestions) * 100).toFixed(2)}%`)
-      .text(`Submit Date: ${moment(takenQuiz.dateTaken).format('MMMM Do YYYY, h:mm A')}`)
-      .moveDown(1.5);
+    // Student info
+    doc.fontSize(8).fillColor(colors.text).font('Helvetica')
+      .text(`${user.name} | ${quizDetail.name} | ${moment(takenQuiz.dateTaken).format('DD/MM/YYYY')}`, 
+        30, 58, { align: 'center', width: doc.page.width - 60 });
+
+    // Score box
+    doc.roundedRect(30, 70, doc.page.width - 60, 38, 3).fill(colors.primary);
+    doc.fontSize(18).fillColor('#FFFFFF').font('Helvetica-Bold')
+      .text(`${correctAnswers}/${totalQuestions}`, 30, 78, { align: 'center', width: doc.page.width - 60 });
+    doc.fontSize(9)
+      .text(`${accuracy}% Accuracy`, 30, 96, { align: 'center', width: doc.page.width - 60 });
+
+    // Performance text
+    let perfText = accuracy >= 90 ? 'Outstanding Performance' : accuracy >= 75 ? 'Great Job' : accuracy >= 50 ? 'Good Effort' : 'Keep Practicing';
+    let perfColor = accuracy >= 75 ? colors.success : accuracy >= 50 ? '#F39C12' : colors.danger;
+    doc.fontSize(9).fillColor(perfColor).font('Helvetica-Bold')
+      .text(perfText, 30, 115, { align: 'center', width: doc.page.width - 60 });
+
+    // Line separator
+    doc.moveTo(30, 130).lineTo(doc.page.width - 30, 130).strokeColor('#DDD').lineWidth(1).stroke();
+
+    let currentY = 138;
 
     // Questions
     review.forEach((item, idx) => {
       const isCorrect = item.selectedOption === item.correctAnswer;
-      const questionNum = `${idx + 1}.`;
+      
+      // Estimate space needed
+      const questionHeight = Math.ceil(item.question.length / 85) * 9;
+      const optionsHeight = item.options.length * 8;
+      const explanationHeight = item.explanation ? Math.ceil(item.explanation.length / 95) * 7 : 0;
+      const totalNeeded = questionHeight + optionsHeight + explanationHeight + 28;
 
-      doc.fontSize(16).fillColor('#1a1a1a').text(`${questionNum} ${item.question}`);
-      doc.moveDown(0.5);
+      // Check if we need new page
+      if (currentY + totalNeeded > doc.page.height - 30) {
+        doc.addPage();
+        drawWatermark();
+        drawHeader();
+        currentY = 28;
+      }
 
+      // Question number badge
+      doc.circle(42, currentY + 4, 7).fill(isCorrect ? colors.success : colors.danger);
+      doc.fontSize(7).fillColor('#FFFFFF').font('Helvetica-Bold')
+        .text(`${idx + 1}`, 39.5, currentY + 1.5);
+
+      // Question text
+      doc.fontSize(8.5).fillColor(colors.dark).font('Helvetica-Bold')
+        .text(item.question, 54, currentY, { width: doc.page.width - 84, lineGap: 0 });
+      
+      currentY = doc.y + 2;
+
+      // Options
       item.options.forEach((opt, i) => {
         const label = String.fromCharCode(65 + i);
-        doc.fontSize(13).fillColor('#000').text(`   ${label}) ${opt}`);
+        const isSelected = item.selectedOption === opt;
+        const isCorrectOpt = item.correctAnswer === opt;
+        
+        let color = colors.text;
+        let font = 'Helvetica';
+        let prefix = '';
+        
+        if (isCorrectOpt) {
+          color = colors.success;
+          font = 'Helvetica-Bold';
+          prefix = '✓ ';
+        } else if (isSelected && !isCorrect) {
+          color = colors.danger;
+          prefix = '✗ ';
+        }
+        
+        doc.fontSize(7.5).fillColor(color).font(font)
+          .text(`${prefix}${label}) ${opt}`, 54, currentY, { width: doc.page.width - 84, lineGap: 0 });
+        currentY = doc.y + 1.5;
       });
 
-      doc.moveDown(0.5);
-      doc.fontSize(12).fillColor('#000').text(`Your Answer: ${item.selectedOption || 'Not Answered'}`);
-      doc.fontSize(12).fillColor(isCorrect ? '#28a745' : '#dc3545').text(`Correct Answer: ${item.correctAnswer}`);
+      // Answer line
+      currentY += 2;
+      doc.fontSize(7).fillColor(colors.text).font('Helvetica')
+        .text('Your: ', 54, currentY, { continued: true })
+        .fillColor(isCorrect ? colors.success : colors.danger).font('Helvetica-Bold')
+        .text(item.selectedOption || 'N/A', { continued: true })
+        .fillColor(colors.text).font('Helvetica')
+        .text(' | Correct: ', { continued: true })
+        .fillColor(colors.success).font('Helvetica-Bold')
+        .text(item.correctAnswer);
+      
+      currentY = doc.y + 2;
 
-      doc.moveDown(0.3);
-      doc.fontSize(12).fillColor('#007bff').text('Explanation:');
-      doc.fontSize(12).fillColor('#000').text(item.explanation);
+      // Explanation
+      if (item.explanation) {
+        doc.fontSize(7).fillColor(colors.primary).font('Helvetica-Bold')
+          .text('Explanation: ', 54, currentY, { continued: true })
+          .fillColor(colors.text).font('Helvetica')
+          .text(item.explanation, { width: doc.page.width - 84, lineGap: 0 });
+        currentY = doc.y + 3;
+      }
 
-      doc.moveDown(1.2);
-      doc.lineWidth(0.5).moveTo(40, doc.y).lineTo(doc.page.width - 40, doc.y).strokeColor('#ccc').stroke();
-      doc.moveDown(1);
+      // Separator
+      currentY += 3;
+      doc.moveTo(30, currentY).lineTo(doc.page.width - 30, currentY)
+        .strokeColor('#EEE').lineWidth(0.5).stroke();
+      currentY += 4;
     });
+
+    // Add footer to all pages after content is done
+    // const range = doc.bufferedPageRange();
+    for (let i = 0; i < 0; i++) {
+      doc.switchToPage(i);
+      doc.fontSize(7).fillColor(colors.text, 0.5)
+        .text(`TutoLink Quiz Review | ${moment().format('DD/MM/YYYY')}`, 30, doc.page.height - 20, 
+          { align: 'center', width: doc.page.width - 60 });
+    }
 
     doc.end();
 

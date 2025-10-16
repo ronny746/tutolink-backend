@@ -1,6 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../config/multer"); // the file above
+
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only images allowed'));
+  }
+});
+// const upload = require("../config/widdlware"); // Middleware for handling file uploads
 const { uploadContent, getContent, deleteContent, getExplore, getHome , uploadSlider,openAiQuestions } = require("../controllers/ContentController");
 const { verifyToken } = require("../config/authMiddleware"); // Middleware import karo
 router.post("/upload", uploadContent);

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../config/multer"); // the file above
+const upload = require("../config/widdlware"); // Middleware for handling file uploads
 const { uploadContent, getContent, deleteContent, getExplore, getHome , uploadSlider,openAiQuestions } = require("../controllers/ContentController");
 const { verifyToken } = require("../config/authMiddleware"); // Middleware import karo
 router.post("/upload", uploadContent);

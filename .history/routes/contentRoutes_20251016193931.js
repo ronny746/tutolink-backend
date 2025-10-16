@@ -4,7 +4,7 @@ const upload = require("../config/multer"); // the file above
 const { uploadContent, getContent, deleteContent, getExplore, getHome , uploadSlider,openAiQuestions } = require("../controllers/ContentController");
 const { verifyToken } = require("../config/authMiddleware"); // Middleware import karo
 router.post("/upload", uploadContent);
-router.post("/slider-upload", upload.single("image"), uploadSlider);
+router.post("/slider-upload", upload.single("file"), uploadSlider);
 router.get("/", getContent);
 router.post("/openAiQuestion", openAiQuestions);
 router.delete("/delete", deleteContent);

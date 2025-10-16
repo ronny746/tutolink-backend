@@ -1,3 +1,4 @@
+const { bucket } = require("../config/firebase");
 const { v4: uuidv4 } = require("uuid");
 const Content = require("../models/content");
 const Subject = require("../models/Subject");
@@ -6,18 +7,52 @@ const User = require("../models/User");
 const Slider = require("../models/slider");
 const Notification = require("../models/notification");
 const Battle = require("../models/quizbattle");
-const path = require("path");
-const fs = require("fs");
+
 
 const apiKey = 'AIzaSyBNGgBHfErE0yfoiIklRClppDC1IOeYgRQ';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+// ✅ Upload Content (PDF to Firebase)
+// exports.uploadContent = async (req, res) => {
+//   try {
+//     const { subjectId, title } = req.body;
+//     const file = req.file;
 
-// ✅ Upload Content with URL
+//     if (!file) return res.status(400).json({ error: "No file uploaded" });
+//     if (!subjectId || !title) return res.status(400).json({ error: "Subject ID and title are required" });
+
+//     const fileId = uuidv4();
+//     const fileUpload = bucket.file(`content/${fileId}-${file.originalname}`);
+
+//     await fileUpload.save(file.buffer, { contentType: file.mimetype });
+
+//     const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
+
+//     const content = new Content({ subjectId, title, pdfUrl: url });
+//     await content.save();
+
+//     res.json({ message: "Content uploaded successfully", content });
+//   } catch (error) {
+//     res.status(500).json({ error: "Error uploading content", details: error.message });
+//   }
+// };
 exports.uploadContent = async (req, res) => {
+ 
   try {
+   
     const { subjectId, pdfUrl, title } = req.body;
+    // const file = req.file;
+
+    // if (!file) return res.status(400).json({ error: "No file uploaded" });
+    // if (!subjectId || !title) return res.status(400).json({ error: "Subject ID and title are required" });
+
+    // const fileId = uuidv4();
+    // const fileUpload = bucket.file(`content/${fileId}-${file.originalname}`);
+
+    // await fileUpload.save(file.buffer, { contentType: file.mimetype });
+
+    // const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
 
     const content = new Content({ subjectId, title, pdfUrl: pdfUrl });
     await content.save();
@@ -27,7 +62,6 @@ exports.uploadContent = async (req, res) => {
     res.status(500).json({ error: "Error uploading content", details: error.message });
   }
 };
-
 // ✅ Get All Content by Subject ID
 exports.getContent = async (req, res) => {
   try {
@@ -62,45 +96,65 @@ exports.deleteContent = async (req, res) => {
   try {
     const { contentId } = req.query;
 
+    // ✅ Find content in MongoDB
     const content = await Content.findById(contentId);
     if (!content) return res.status(404).json({ error: "Content not found" });
 
+    // ✅ Extract Firebase Storage path correctly
+    const fileUrl = content.pdfUrl;
+    const fileName = decodeURIComponent(fileUrl.split("/").pop().split("?")[0]); // Fix encoding issues
+
+    console.log("Deleting file:", `content/${fileName}`);
+
+    // ✅ Delete the file from Firebase Storage
+    await bucket.file(`content/${fileName}`).delete();
+
+    // ✅ Delete content from MongoDB
     await Content.findByIdAndDelete(contentId);
 
-    res.json({ message: "Content deleted successfully" });
+    res.json({ message: "Content deleted successfully from MongoDB and Firebase" });
   } catch (error) {
     res.status(500).json({ error: "Error deleting content", details: error.message });
   }
 };
 
-// ✅ Get Explore
+
+
 exports.getExplore = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id; // ✅ Extract user ID from token
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized access" });
     }
 
+    // ✅ Fetch user details with quizzesTaken
     const user = await User.findById(userId).select("quizzesTaken");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // ✅ Extract attempted quiz IDs
     const attemptedQuizIds = user.quizzesTaken.map(q => q.quizId.toString());
 
+    // ✅ Fetch all content
     const contents = await Content.find({}, "title description type pdfUrl");
+
+    // ✅ Fetch all subjects
     const subjects = await Subject.find({}, "name description");
+
+    // ✅ Fetch only unattempted quizzes
     const quizzes = await Quiz.find(
-      { _id: { $nin: attemptedQuizIds } },
+      { _id: { $nin: attemptedQuizIds } }, // ❌ Exclude attempted quizzes
       "name duration instructions"
     );
 
     res.json({
       message: "Overview fetched successfully",
       data: {
+
         contents,
         subjects,
-        quizzes,
+        quizzes, // ✅ Only unattempted quizzes
       }
     });
   } catch (error) {
@@ -108,7 +162,7 @@ exports.getExplore = async (req, res) => {
   }
 };
 
-// ✅ Get Home
+
 exports.getHome = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -135,15 +189,18 @@ exports.getHome = async (req, res) => {
         .sort({ rating: -1 })
     ]);
 
+    // ⛔️ Remove already attempted quizzes
     const attemptedIds = new Set(user.quizzesTaken.map(q => q.quizId.toString()));
     const unattemptedQuizzes = featuredQuizzes.filter(q => !attemptedIds.has(q._id.toString()));
 
+    // 🎨 Apply gradient colors to each quiz
     const quizzesWithColors = unattemptedQuizzes.map((quiz, index) => ({
       ...quiz._doc,
       color1: colors[index % colors.length].color1,
       color2: colors[index % colors.length].color2
     }));
 
+    // 🧮 Rank calculation
     const higherUsers = await User.countDocuments({ points: { $gt: user.points } });
     const userRank = higherUsers + 1;
 
@@ -174,7 +231,10 @@ exports.getHome = async (req, res) => {
   }
 };
 
-// ✅ Upload Slider with Multer (Local Storage)
+
+
+
+
 exports.uploadSlider = async (req, res) => {
   try {
     const { title, category, redirectUrl } = req.body;
@@ -183,66 +243,24 @@ exports.uploadSlider = async (req, res) => {
     if (!file) return res.status(400).json({ error: "No file uploaded" });
     if (!title) return res.status(400).json({ error: "Title is required" });
 
-    // Ensure upload directory exists
-    const uploadDir = path.join(__dirname, "../uploads/sliders");
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    const fileId = uuidv4();
+    const fileUpload = bucket.file(`sliders/${fileId}-${file.originalname}`);
 
-    // Generate a unique filename and move file if needed
-    const ext = path.extname(file.originalname);
-    const filename = `${uuidv4()}${ext}`;
-    const filepath = path.join(uploadDir, filename);
+    await fileUpload.save(file.buffer, { contentType: file.mimetype });
 
-    // If Multer already saved the file to disk (diskStorage), move/rename it
-    if (file.path) {
-      fs.renameSync(file.path, filepath); // rename to our generated filename
-    } else if (file.buffer) {
-      // fallback if using memoryStorage
-      fs.writeFileSync(filepath, file.buffer);
-    } else {
-      return res.status(400).json({ error: "File data is missing" });
-    }
+    const [url] = await fileUpload.getSignedUrl({ action: "read", expires: "01-01-2030" });
 
-    // Generate public URL
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/sliders/${filename}`;
-
-    // Save to database
-    const slider = new Slider({ title, category, redirectUrl, imageUrl });
+    const slider = new Slider({ title, category, imageUrl: url, redirectUrl });
     await slider.save();
 
-    res.status(200).json({ message: "Slider uploaded successfully", slider });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error uploading slider", details: err.message });
-  }
-};
-
-// ✅ Delete Slider
-exports.deleteSlider = async (req, res) => {
-  try {
-    const { sliderId } = req.query;
-
-    const slider = await Slider.findById(sliderId);
-    if (!slider) return res.status(404).json({ error: "Slider not found" });
-
-    // ✅ Extract filename from URL
-    const filename = path.basename(slider.imageUrl);
-    const filepath = path.join(__dirname, '../uploads/sliders', filename);
-
-    // ✅ Delete file from local storage
-    if (fs.existsSync(filepath)) {
-      fs.unlinkSync(filepath);
-    }
-
-    // ✅ Delete from database
-    await Slider.findByIdAndDelete(sliderId);
-
-    res.json({ message: "Slider deleted successfully" });
+    res.json({ message: "Slider uploaded successfully", slider });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting slider", details: error.message });
+    res.status(500).json({ error: "Error uploading slider", details: error.message });
   }
 };
 
-// ✅ OpenAI Questions Generator
+
+
 exports.openAiQuestions = async (req, res) => {
   try {
     const { topic } = req.body;
@@ -250,6 +268,7 @@ exports.openAiQuestions = async (req, res) => {
       return res.status(400).json({ error: "Topic is required" });
     }
 
+    // ✅ Structured Prompting
     const prompt = `
     Generate a quiz on the topic: "${topic}" in this JSON format:
 
@@ -285,9 +304,10 @@ exports.openAiQuestions = async (req, res) => {
     const response = await result.response;
     let text = await response.text();
 
+    // ✅ Remove unwanted characters & backticks before parsing JSON
     text = text.replace(/```json|```/g, '').trim();
 
-    const quizData = JSON.parse(text);
+    const quizData = JSON.parse(text); // Parse only clean JSON
     res.json(quizData);
 
   } catch (error) {

@@ -183,36 +183,28 @@ exports.uploadSlider = async (req, res) => {
     if (!file) return res.status(400).json({ error: "No file uploaded" });
     if (!title) return res.status(400).json({ error: "Title is required" });
 
-    // Ensure upload directory exists
-    const uploadDir = path.join(__dirname, "../uploads/sliders");
+    const fileId = uuidv4();
+    const ext = path.extname(file.originalname);
+    const filename = `${fileId}${ext}`;
+
+    const uploadDir = path.join(__dirname, '../uploads/slider');
     if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-    // Generate a unique filename and move file if needed
-    const ext = path.extname(file.originalname);
-    const filename = `${uuidv4()}${ext}`;
+    // ✅ Ensure file.buffer exists
+    if (!file.buffer) return res.status(400).json({ error: "File buffer is missing" });
+
     const filepath = path.join(uploadDir, filename);
+    fs.writeFileSync(filepath, file.buffer); // now safe
 
-    // If Multer already saved the file to disk (diskStorage), move/rename it
-    if (file.path) {
-      fs.renameSync(file.path, filepath); // rename to our generated filename
-    } else if (file.buffer) {
-      // fallback if using memoryStorage
-      fs.writeFileSync(filepath, file.buffer);
-    } else {
-      return res.status(400).json({ error: "File data is missing" });
-    }
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/sliders/${filename}`;
 
-    // Generate public URL
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/sliders/${filename}`;
-
-    // Save to database
-    const slider = new Slider({ title, category, redirectUrl, imageUrl });
+    const slider = new Slider({ title, category, imageUrl, redirectUrl });
     await slider.save();
 
-    res.status(200).json({ message: "Slider uploaded successfully", slider });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error uploading slider", details: err.message });
+    res.json({ message: "Slider uploaded successfully", slider });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error uploading slider", details: error.message });
   }
 };
 

@@ -30,9 +30,13 @@ app.use(cors());
 app.use("/uploads", express.static("uploads"));
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/tutolink")
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+mongoose.connect("mongodb://127.0.0.1:27017/tutolink", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error(err));
+
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);

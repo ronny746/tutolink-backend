@@ -6,7 +6,6 @@ const { verifyToken } = require("../config/authMiddleware"); // Middleware impor
 router.post("/upload", uploadContent);
 
 router.get("/", getContent);
-router.post("/slider-upload", upload.single("image"), uploadSlider);
 router.post("/openAiQuestion", openAiQuestions);
 router.delete("/delete", deleteContent);
 router.get("/getExplore", verifyToken, getExplore);

@@ -1,10 +1,10 @@
 const Onboarding = require("../models/onboading");
 const { v4: uuidv4 } = require("uuid");
-
+const { bucket } = require("../config/firebase");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
+const { v4: uuidv4 } = require("uuid");
 // ✅ Get All Onboarding Screens
 exports.getOnboardingScreens = async (req, res) => {
   try {

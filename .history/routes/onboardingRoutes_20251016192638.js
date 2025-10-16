@@ -1,5 +1,5 @@
 const express = require("express");
-const upload = require("../config/multer"); // the file above
+const upload = require("../config/widdlware");
 const { getOnboardingScreens, addOnboardingScreen } = require("../controllers/onboardingController");
 
 const router = express.Router();

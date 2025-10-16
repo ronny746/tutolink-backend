@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../config/multer"); // the file above
+const upload = require("../config/widdlware");
 const { createCategory, getCategories, deleteCategory} = require("../controllers/categoryController");
 
 router.post("/create",upload.single("file"), createCategory);

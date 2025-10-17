@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Details - TutoLink</title>
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    :root{--bg-primary:#0a0a1a;--bg-secondary:#1a1a3e;--bg-tertiary:#0f2847;--text-primary:#fff;--text-secondary:rgba(255,255,255,.7);--card-bg:rgba(255,255,255,.02);--card-border:rgba(255,255,255,.05);--accent-primary:#ff6b6b;--accent-secondary:#4ecdc4;--glass-bg:rgba(10,10,26,.9)}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#0a0a1a 0%,#1a1a3e 100%);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;position:relative;overflow-x:hidden;}
+    body::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(78,205,196,0.1) 0%,transparent 70%);top:-100px;right:-100px;border-radius:50%;pointer-events:none;}
+    body::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(255,107,107,0.1) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;pointer-events:none;}
+    .container{max-width:600px;width:100%;position:relative;z-index:1;}
+    .header{text-align:center;padding:30px 0 40px;font-size:2.2rem;font-weight:700;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px;}
+    .battle-card{background:rgba(255,255,255,.03);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:35px;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .3s ease,box-shadow .3s ease;}
+    .battle-card:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,0,0,.4);}
+    .battle-card h2{margin-bottom:25px;font-size:1.8rem;text-align:center;color:var(--text-primary);font-weight:700;}
+    .detail-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .detail-row:last-of-type{border-bottom:none;}
+    .detail-label{font-weight:600;color:var(--text-secondary);font-size:.95rem;}
+    .detail-value{font-weight:600;color:var(--text-primary);text-align:right;font-size:.95rem;}
+    .detail-value.status{padding:4px 12px;border-radius:20px;background:linear-gradient(90deg,rgba(78,205,196,.2),rgba(78,205,196,.3));border:1px solid var(--accent-secondary);font-size:.85rem;text-transform:uppercase;}
+    .participants-section{margin-top:25px;padding-top:20px;border-top:2px solid rgba(255,255,255,.08);}
+    .participants-label{font-weight:600;color:var(--text-secondary);margin-bottom:12px;display:block;}
+    .participants{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+    .participant{background:linear-gradient(135deg,var(--accent-secondary),#3ba89f);padding:8px 15px;border-radius:20px;color:#fff;font-weight:600;font-size:.85rem;box-shadow:0 2px 8px rgba(78,205,196,.3);transition:transform .2s ease,box-shadow .2s ease;}
+    .participant:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(78,205,196,.5);}
+    .btn-container{text-align:center;margin-top:30px;}
+    .btn{display:inline-block;padding:14px 35px;border-radius:30px;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));color:#fff;text-decoration:none;font-weight:700;font-size:1rem;box-shadow:0 4px 15px rgba(255,107,107,.4);transition:transform .3s ease,box-shadow .3s ease;}
+    .btn:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(255,107,107,.6);}
+    .btn:active{transform:translateY(-1px);}
+    @media(max-width:600px){.header{font-size:1.8rem;}.battle-card{padding:25px;}.detail-row{flex-direction:column;align-items:flex-start;gap:5px;}.detail-value{text-align:left;}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">TutoLink Battle</div>
+
+    <div class="battle-card" id="battleCard">
+      <h2 id="quizName">Loading...</h2>
+      
+      <div class="detail-row">
+        <span class="detail-label">Subject</span>
+        <span class="detail-value" id="subjectName">-</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="detail-label">Battle Code</span>
+        <span class="detail-value" id="battleCode">-</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="detail-label">Created By</span>
+        <span class="detail-value" id="createdBy">-</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="detail-label">Start Time</span>
+        <span class="detail-value" id="startTime">-</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="detail-label">End Time</span>
+        <span class="detail-value" id="endTime">-</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <span class="detail-value status" id="status">-</span>
+      </div>
+
+      <div class="participants-section">
+        <span class="participants-label">Participants</span>
+        <div class="participants" id="participants"></div>
+      </div>
+
+      <div class="btn-container">
+        <a href="https://play.google.com/store/apps/details?id=com.tutolink.app&utm_source=battle_page&utm_medium=web&utm_campaign=join_battle&referrer=battleId%3D..." class="btn">Join Battle in App</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchBattleDetails() {
+      // get battleId and battleCode from query params
+      const params = new URLSearchParams(window.location.search);
+      const battleId = params.get('battleId');
+      const battleCode = params.get('battleCode');
+
+      if(!battleId) {
+        document.getElementById('quizName').textContent = "Invalid battle link.";
+        return;
+      }
+
+      try {
+        // Build URL with battleId and optionally battleCode
+        let url = `https://tutolink.in/api/battle/details?battleId=${battleId}`;
+        if(battleCode) {
+          url += `&battleCode=${battleCode}`;
+        }
+        
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {'Content-Type': 'application/json'}
+        });
+        const data = await res.json();
+
+        if(data.success && data.battle) {
+          const battle = data.battle;
+          document.getElementById('quizName').textContent = battle.quizId.name;
+          document.getElementById('subjectName').textContent = battle.quizId.subjectId.name;
+          document.getElementById('battleCode').textContent = battle.battleCode;
+          document.getElementById('createdBy').textContent = battle.createdBy.name;
+          document.getElementById('startTime').textContent = new Date(battle.startTime).toLocaleString();
+          document.getElementById('endTime').textContent = new Date(battle.endTime).toLocaleString();
+          document.getElementById('status').textContent = battle.status;
+
+          const participantsDiv = document.getElementById('participants');
+          participantsDiv.innerHTML = '';
+          battle.participants.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'participant';
+            span.textContent = p.name;
+            participantsDiv.appendChild(span);
+          });
+        } else {
+          document.getElementById('quizName').textContent = "Battle not found.";
+        }
+      } catch(err) {
+        console.error(err);
+        document.getElementById('quizName').textContent = "Error loading battle.";
+      }
+    }
+
+    fetchBattleDetails();
+  </script>
+</body>
+</html>

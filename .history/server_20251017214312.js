@@ -78,7 +78,7 @@ app.get("/request", (req, res) => {
 });
 
 app.get("/battle", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "battle.html"));
+  res.sendFile(path.join(__dirname, "public", "battel.html"));
 });
 
 app.get("/.well-known/assetlinks.json", (req, res) => {

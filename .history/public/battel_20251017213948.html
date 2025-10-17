@@ -1,0 +1,87 @@
+<!-- FILE: battle.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Details - TutoLink</title>
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    :root{--bg-primary:#0a0a1a;--bg-secondary:#1a1a3e;--bg-tertiary:#0f2847;--text-primary:#fff;--text-secondary:rgba(255,255,255,.7);--card-bg:rgba(255,255,255,.02);--card-border:rgba(255,255,255,.05);--accent-primary:#ff6b6b;--accent-secondary:#4ecdc4;--glass-bg:rgba(10,10,26,.9)}
+    body{font-family:sans-serif;background:var(--bg-primary);color:var(--text-primary);padding:0 20px;}
+    .header{padding:20px 0;font-size:1.8rem;font-weight:700;}
+    .battle-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:20px;margin-top:20px;}
+    .battle-card h2{margin-bottom:10px;}
+    .participants{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+    .participant{background:var(--accent-secondary);padding:5px 12px;border-radius:6px;color:#fff;font-weight:600;}
+    .btn{display:inline-block;margin-top:15px;padding:10px 18px;border-radius:8px;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));color:#fff;text-decoration:none;font-weight:700;}
+  </style>
+</head>
+<body>
+  <div class="header">TutoLink - Battle Details</div>
+
+  <div class="battle-card" id="battleCard">
+    <h2 id="quizName">Loading...</h2>
+    <p><strong>Subject:</strong> <span id="subjectName">-</span></p>
+    <p><strong>Battle Code:</strong> <span id="battleCode">-</span></p>
+    <p><strong>Created By:</strong> <span id="createdBy">-</span></p>
+    <p><strong>Start Time:</strong> <span id="startTime">-</span></p>
+    <p><strong>End Time:</strong> <span id="endTime">-</span></p>
+    <p><strong>Status:</strong> <span id="status">-</span></p>
+    <div>
+      <strong>Participants:</strong>
+      <div class="participants" id="participants"></div>
+    </div>
+    <a href="https://play.google.com/store/apps/details?id=com.tutolink" class="btn">Join Battle in App</a>
+  </div>
+
+  <script>
+    async function fetchBattleDetails() {
+      // get battleId and battleCode from query params
+      const params = new URLSearchParams(window.location.search);
+      const battleId = params.get('battleId');
+      const battleCode = params.get('battleCode');
+
+      if(!battleId || !battleCode) {
+        document.getElementById('quizName').textContent = "Invalid battle link.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://tutolink.in/api/battle/details?battleId=${battleId}&battleCode=${battleCode}`, {
+          method: 'GET',
+          headers: {'Content-Type': 'application/json'}
+        });
+        const data = await res.json();
+
+        if(data.success && data.battle) {
+          const battle = data.battle;
+          document.getElementById('quizName').textContent = battle.quizId.name;
+          document.getElementById('subjectName').textContent = battle.quizId.subjectId.name;
+          document.getElementById('battleCode').textContent = battle.battleCode;
+          document.getElementById('createdBy').textContent = battle.createdBy.name;
+          document.getElementById('startTime').textContent = new Date(battle.startTime).toLocaleString();
+          document.getElementById('endTime').textContent = new Date(battle.endTime).toLocaleString();
+          document.getElementById('status').textContent = battle.status;
+
+          const participantsDiv = document.getElementById('participants');
+          participantsDiv.innerHTML = '';
+          battle.participants.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'participant';
+            span.textContent = p.name;
+            participantsDiv.appendChild(span);
+          });
+        } else {
+          document.getElementById('quizName').textContent = "Battle not found.";
+        }
+      } catch(err) {
+        console.error(err);
+        document.getElementById('quizName').textContent = "Error loading battle.";
+      }
+    }
+
+    fetchBattleDetails();
+  </script>
+</body>
+</html>

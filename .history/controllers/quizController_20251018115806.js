@@ -677,281 +677,39 @@ exports.getPDFReview = async (req, res) => {
   }
 };
 
-exports.submitQuiz = async (req, res) => {
-  try {
-    const { quizId, score, answers } = req.body;
-    const userId = req.user.id;
-
-    // ✅ Validation
-    if (!quizId || score === undefined || !answers || answers.length === 0) {
-      return res.status(400).json({ 
-        message: "Quiz ID, score, and answers are required" 
-      });
-    }
-
-    // ✅ Find user
-    let user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // ✅ Find if quiz already attempted
-    let quizIndex = user.quizzesTaken.findIndex(
-      q => q.quizId.toString() === quizId
-    );
-
-    if (quizIndex !== -1) {
-      // ✅ Quiz already attempted - UPDATE answers
-      let existingQuiz = user.quizzesTaken[quizIndex];
-      
-      // ✅ Remove old score from total points
-      user.points -= existingQuiz.score;
-
-      // ✅ Update answers intelligently
-      answers.forEach((newAnswer) => {
-        let questionIndex = existingQuiz.answers.findIndex(
-          (ans) => ans.questionId.toString() === newAnswer.questionId
-        );
-
-        if (questionIndex !== -1) {
-          // ✅ Question already answered - REPLACE with new answer
-          existingQuiz.answers[questionIndex] = {
-            questionId: newAnswer.questionId,
-            selectedOption: newAnswer.selectedOption,
-            correctAnswer: newAnswer.correctAnswer
-          };
-        } else {
-          // ✅ New question answered - ADD to answers array
-          existingQuiz.answers.push({
-            questionId: newAnswer.questionId,
-            selectedOption: newAnswer.selectedOption,
-            correctAnswer: newAnswer.correctAnswer
-          });
-        }
-      });
-
-      // ✅ Update score with NEW score
-      existingQuiz.score = parseInt(score);
-      
-      // ✅ Add updated score to total points
-      user.points += existingQuiz.score;
-
-      console.log(`✅ Updated Quiz: ${quizId}`);
-      console.log(`Old Score Removed, New Score: ${existingQuiz.score}`);
-      console.log(`Total Answers: ${existingQuiz.answers.length}`);
-
-    } else {
-      // ✅ First time attempting - ADD new quiz entry
-      user.quizzesTaken.push({
-        quizId,
-        score: parseInt(score),
-        answers: answers.map(ans => ({
-          questionId: ans.questionId,
-          selectedOption: ans.selectedOption,
-          correctAnswer: ans.correctAnswer
-        })),
-        dateTaken: new Date()
-      });
-
-      // ✅ Add score to total points
-      user.points += parseInt(score);
-
-      console.log(`✅ New Quiz Attempted: ${quizId}`);
-      console.log(`Score: ${score}`);
-      console.log(`Total Answers: ${answers.length}`);
-    }
-
-    // ✅ Recalculate total points from ALL quizzes (safety check)
-    user.points = user.quizzesTaken.reduce((acc, quiz) => {
-      return acc + (parseInt(quiz.score) || 0);
-    }, 0);
-
-    // ✅ Save user
-    await user.save();
-
-    console.log(`✅ User Total Points: ${user.points}`);
-
-    res.json({
-      success: true,
-      message: "Quiz submitted successfully",
-      data: {
-        quizId,
-        score: parseInt(score),
-        totalAnswers: answers.length,
-        totalPoints: user.points,
-        quizzesTaken: user.quizzesTaken.length
-      }
-    });
-
-  } catch (error) {
-    console.error("❌ Submit Quiz Error:", error);
-    res.status(500).json({ 
-      success: false,
-      message: "Server Error", 
-      error: error.message 
-    });
-  }
-};
-
-
-// ✅ BONUS: Get Quiz Review with proper answer matching
 exports.getQuizReview = async (req, res) => {
   try {
-    const { quizId } = req.params;
-    const userId = req.user.id;
+    const { quizId } = req.params; // Get quiz ID
+    const userId = req.user.id; // Token se user ID extract
 
     // ✅ Find user
     let user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // ✅ Find user's quiz attempt
-    let takenQuiz = user.quizzesTaken.find(
-      q => q.quizId.toString() === quizId
-    );
-    
-    if (!takenQuiz) {
-      return res.status(404).json({ 
-        message: "Quiz not found in user's history" 
-      });
-    }
+    // ✅ Find user taken quiz
+    let takenQuiz = user.quizzesTaken.find(q => q.quizId.toString() === quizId);
+    if (!takenQuiz) return res.status(404).json({ message: "Quiz not found in user's history" });
 
-    // ✅ Get quiz with all questions
+    // ✅ Get all questions for this quiz
     let quiz = await Quiz.findById(quizId).populate("questions");
-    let quizDetail = await Quiz.findById(quizId).select(
-      "name totalPoints rating duration totalQuestions averageScore participants instructions"
-    );
+    let quizDetail = await Quiz.findById(quizId).select("name totalPoints rating duration  totalQuestions averageScore participants instructions ");
 
-    if (!quiz) {
-      return res.status(404).json({ message: "Quiz not found" });
-    }
+    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
 
-    // ✅ Create a map of questionId -> selectedOption for faster lookup
-    const answersMap = new Map();
-    takenQuiz.answers.forEach(ans => {
-      answersMap.set(ans.questionId.toString(), ans.selectedOption);
-    });
-
-    // ✅ Prepare review data with CORRECT answer matching
-    let review = quiz.questions.map((q) => ({
+    // ✅ Prepare review data
+    let review = quiz.questions.map((q, index) => ({
       questionId: q._id,
       question: q.question,
       options: q.options,
-      selectedOption: answersMap.get(q._id.toString()) || null, // ✅ Match by questionId
+      selectedOption: takenQuiz.answers ? takenQuiz.answers[index] : null, // Store user's selected answers in DB
       correctAnswer: q.correctAnswer,
-      explanation: q.explanation
+      explanation: q.explanation // ✅ Include Explanation
     }));
 
-    res.json({ 
-      success: true,
-      quizDetail, 
-      review 
-    });
-
+    res.json({ quizDetail, review });
   } catch (error) {
-    console.error("❌ Quiz Review Error:", error);
-    res.status(500).json({ 
-      success: false,
-      message: "Server Error", 
-      error: error.message 
-    });
-  }
-};
-
-
-// ✅ BONUS: Get Quiz Result with accurate calculations
-exports.quizResult = async (req, res) => {
-  try {
-    const { quizId } = req.params;
-    const userId = req.user.id;
-
-    if (!userId) {
-      return res.status(401).json({ 
-        error: "Unauthorized, user not found in request" 
-      });
-    }
-
-    // ✅ Fetch user with quiz attempts
-    const user = await User.findById(userId).populate("quizzesTaken.quizId");
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // ✅ Find specific quiz attempt
-    const attempt = user.quizzesTaken.find(
-      q => q.quizId?._id?.toString() === quizId
-    );
-
-    if (!attempt) {
-      return res.status(404).json({ error: "Quiz attempt not found" });
-    }
-
-    // ✅ Fetch quiz details
-    const quiz = attempt.quizId;
-
-    // ✅ Calculate results accurately
-    const totalAttempted = attempt.answers.length;
-    const correctAnswers = attempt.answers.filter(
-      a => a.selectedOption === a.correctAnswer
-    ).length;
-    const wrongAnswers = totalAttempted - correctAnswers;
-    
-    // ✅ Points calculation (customize as needed)
-    const pointsPerCorrect = 10;
-    const pointsPerWrong = 0; // No negative marking
-    const correctPoints = correctAnswers * pointsPerCorrect;
-    const wrongPoints = wrongAnswers * pointsPerWrong;
-    const totalPoints = correctPoints + wrongPoints;
-
-    // ✅ Calculate accuracy
-    const accuracy = totalAttempted > 0 
-      ? ((correctAnswers / totalAttempted) * 100).toFixed(1) 
-      : 0;
-
-    res.json({
-      success: true,
-      message: "Quiz result fetched successfully",
-      data: {
-        id: quiz._id,
-        title: quiz.name,
-        rating: quiz.rating,
-        completionTime: `Completed on ${new Date(attempt.dateTaken).toDateString()}`,
-        accuracy: `${accuracy}%`,
-        attempted: {
-          label: "Attempted",
-          value: totalAttempted
-        },
-        correctAnswers: {
-          label: "Correct Answers",
-          value: correctAnswers,
-          points: correctPoints
-        },
-        wrongAnswers: {
-          label: "Wrong Answers",
-          value: wrongAnswers,
-          points: wrongPoints
-        },
-        overallPoints: {
-          label: "Overall Points",
-          value: totalPoints
-        },
-        score: attempt.score,
-        actions: [
-          { label: "Review Answers", action: "/review-answers" },
-          { label: "Play Again", action: "/play-again" }
-        ]
-      }
-    });
-
-  } catch (error) {
-    console.error("❌ Quiz Result Error:", error);
-    res.status(500).json({ 
-      success: false,
-      error: "Error fetching quiz result", 
-      details: error.message 
-    });
+    console.error("Quiz Review Error:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -986,7 +744,78 @@ exports.deleteUserTakenQuiz = async (req, res) => {
 
 
 
+exports.quizResult = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const userId = req.user.id; // Ensure userId exists
 
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized, user not found in request" });
+    }
+
+    // Fetch user attempt from quizzesTaken array
+    const user = await User.findById(userId).populate("quizzesTaken.quizId");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the specific quiz attempt
+    const attempt = user.quizzesTaken.find(q => q.quizId?._id?.toString() === quizId);
+
+
+    if (!attempt) {
+      return res.status(404).json({ error: "Quiz attempt not found" });
+    }
+
+    // Fetch quiz details
+    const quiz = attempt.quizId;
+
+    // Calculate points
+    const correctAnswers = attempt.answers.filter(a => a.selectedOption === a.correctAnswer).length;
+    const wrongAnswers = attempt.answers.length - correctAnswers;
+    const correctPoints = correctAnswers * 1;  // Example: 10 points per correct answer
+    const wrongPoints = wrongAnswers * 0; // Example: -5 points per wrong answer
+    const totalPoints = correctPoints + wrongPoints;
+
+    res.json({
+      message: "Quiz result fetched successfully",
+      data: {
+        id: quiz._id,
+        title: quiz.name,
+        rating: quiz.rating,
+        completionTime: `Completed Quiz On ${new Date(attempt.dateTaken).toDateString()}`,
+        attempted: {
+          label: "Attempted",
+          value: attempt.answers.length
+        },
+        correctAnswers: {
+          label: "Correct Answers",
+          value: correctAnswers,
+          points: correctPoints
+        },
+        wrongAnswers: {
+          label: "Wrong Answers",
+          value: wrongAnswers,
+          points: wrongPoints
+        },
+        overallPoints: {
+          label: "Overall Points",
+          value: totalPoints
+        },
+        additionalInfo: "This quiz is a contest type, so results will be declared after the contest ends.",
+        solutionInfo: "This Quiz does not contain solutions",
+        actions: [
+          { label: "Review Answers", action: "/review-answers" },
+          { label: "Play Again", action: "/play-again" }
+        ]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching quiz result", details: error.message });
+  }
+};
 
 exports.createQuizForBattle = async (req, res) => {
   try {

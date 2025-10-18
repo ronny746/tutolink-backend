@@ -986,7 +986,78 @@ exports.deleteUserTakenQuiz = async (req, res) => {
 
 
 
+exports.quizResult = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const userId = req.user.id; // Ensure userId exists
 
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized, user not found in request" });
+    }
+
+    // Fetch user attempt from quizzesTaken array
+    const user = await User.findById(userId).populate("quizzesTaken.quizId");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the specific quiz attempt
+    const attempt = user.quizzesTaken.find(q => q.quizId?._id?.toString() === quizId);
+
+
+    if (!attempt) {
+      return res.status(404).json({ error: "Quiz attempt not found" });
+    }
+
+    // Fetch quiz details
+    const quiz = attempt.quizId;
+
+    // Calculate points
+    const correctAnswers = attempt.answers.filter(a => a.selectedOption === a.correctAnswer).length;
+    const wrongAnswers = attempt.answers.length - correctAnswers;
+    const correctPoints = correctAnswers * 1;  // Example: 10 points per correct answer
+    const wrongPoints = wrongAnswers * 0; // Example: -5 points per wrong answer
+    const totalPoints = correctPoints + wrongPoints;
+
+    res.json({
+      message: "Quiz result fetched successfully",
+      data: {
+        id: quiz._id,
+        title: quiz.name,
+        rating: quiz.rating,
+        completionTime: `Completed Quiz On ${new Date(attempt.dateTaken).toDateString()}`,
+        attempted: {
+          label: "Attempted",
+          value: attempt.answers.length
+        },
+        correctAnswers: {
+          label: "Correct Answers",
+          value: correctAnswers,
+          points: correctPoints
+        },
+        wrongAnswers: {
+          label: "Wrong Answers",
+          value: wrongAnswers,
+          points: wrongPoints
+        },
+        overallPoints: {
+          label: "Overall Points",
+          value: totalPoints
+        },
+        additionalInfo: "This quiz is a contest type, so results will be declared after the contest ends.",
+        solutionInfo: "This Quiz does not contain solutions",
+        actions: [
+          { label: "Review Answers", action: "/review-answers" },
+          { label: "Play Again", action: "/play-again" }
+        ]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching quiz result", details: error.message });
+  }
+};
 
 exports.createQuizForBattle = async (req, res) => {
   try {

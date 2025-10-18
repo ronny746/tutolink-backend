@@ -134,29 +134,15 @@
     }, 1000);
 
     async function fetchBattleDetails() {
-      // Extract battleCode from URL - supports both formats:
-      // 1. Query param: http://localhost:3000/battle?q=D0DB37
-      // 2. Path: https://tutolink.app/battle/D0DB37
-      
-      let battleCode = null;
-      
-      // First try to get from query parameter
-      const params = new URLSearchParams(window.location.search);
-      battleCode = params.get('q');
-      
-      // If not found in query, try to extract from path
-      if(!battleCode) {
-        const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
-        if(pathParts.length > 1 && pathParts[0] === 'battle') {
-          battleCode = pathParts[1];
-        }
-      }
+      // Extract battleCode from URL path
+      // URL format: https://tutolink.app/battle/D0DB37 or http://localhost:3000/battle/D0DB37
+      const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
+      const battleCode = pathParts[pathParts.length - 1];
 
       console.log('Path:', window.location.pathname);
-      console.log('Query:', window.location.search);
       console.log('Battle Code:', battleCode);
 
-      if(!battleCode || battleCode.length === 0) {
+      if(!battleCode || battleCode === 'battle' || battleCode.length === 0) {
         document.getElementById('quizName').textContent = "Invalid battle link.";
         return;
       }

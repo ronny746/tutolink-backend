@@ -76,17 +76,17 @@ exports.deleteContent = async (req, res) => {
 // ✅ Get Explore
 exports.getExplore = async (req, res) => {
   try {
-    const userId = req.user.id;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized access" });
-    }
+    // const userId = req.user.id;
+    // if (!userId) {
+    //   return res.status(401).json({ message: "Unauthorized access" });
+    // }
 
-    const user = await User.findById(userId).select("quizzesTaken");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    // const user = await User.findById(userId).select("quizzesTaken");
+    // if (!user) {
+    //   return res.status(404).json({ message: "User not found" });
+    // }
 
-    const attemptedQuizIds = user.quizzesTaken.map(q => q.quizId.toString());
+    // const attemptedQuizIds = user.quizzesTaken.map(q => q.quizId.toString());
 
     // Fetch all subjects with their related content
     const subjects = await Subject.find({})

@@ -88,115 +88,23 @@ exports.getExplore = async (req, res) => {
 
     const attemptedQuizIds = user.quizzesTaken.map(q => q.quizId.toString());
 
-    // Fetch all subjects with their related content
-    const subjects = await Subject.find({})
-      .select("name description")
-      .lean();
-
-    // Fetch contents with subject info
-    const contents = await Content.find({})
-      .select("title description type pdfUrl subject")
-      .populate("subject", "name")
-      .lean();
-
-    // Fetch quizzes with subject info
-    const quizzes = await Quiz.find({ _id: { $nin: attemptedQuizIds } })
-      .select("name duration instructions subject questions")
-      .populate("subject", "name")
-      .lean();
-
-    // Group data by subjects
-    const subjectWiseData = subjects.map(subject => {
-      // Filter quizzes for this subject
-      const subjectQuizzes = quizzes.filter(
-        quiz => quiz.subject && quiz.subject._id.toString() === subject._id.toString()
-      ).map(quiz => ({
-        id: quiz._id,
-        name: quiz.name,
-        duration: quiz.duration,
-        instructions: quiz.instructions,
-        totalQuestions: quiz.questions?.length || 0,
-      }));
-
-      // Filter contents for this subject
-      const subjectContents = contents.filter(
-        content => content.subject && content.subject._id.toString() === subject._id.toString()
-      ).map(content => ({
-        id: content._id,
-        title: content.title,
-        description: content.description,
-        type: content.type,
-        pdfUrl: content.pdfUrl,
-      }));
-
-      return {
-        subjectId: subject._id,
-        subjectName: subject.name,
-        subjectDescription: subject.description,
-        totalQuizzes: subjectQuizzes.length,
-        totalContents: subjectContents.length,
-        quizzes: subjectQuizzes,
-        contents: subjectContents,
-      };
-    });
-
-    // Filter out subjects with no content or quizzes (optional)
-    const filteredSubjects = subjectWiseData.filter(
-      subject => subject.totalQuizzes > 0 || subject.totalContents > 0
+    const contents = await Content.find({}, "title description type pdfUrl");
+    const subjects = await Subject.find({}, "name description");
+    const quizzes = await Quiz.find(
+      { _id: { $nin: attemptedQuizIds } },
+      "name duration instructions"
     );
 
-    // Also provide ungrouped data for backward compatibility
-    const allQuizzes = quizzes.map(quiz => ({
-      id: quiz._id,
-      name: quiz.name,
-      duration: quiz.duration,
-      instructions: quiz.instructions,
-      totalQuestions: quiz.questions?.length || 0,
-      subject: quiz.subject?.name || "General",
-    }));
-
-    const allContents = contents.map(content => ({
-      id: content._id,
-      title: content.title,
-      description: content.description,
-      type: content.type,
-      pdfUrl: content.pdfUrl,
-      subject: content.subject?.name || "General",
-    }));
-
     res.json({
-      success: true,
-      message: "Explore data fetched successfully",
+      message: "Overview fetched successfully",
       data: {
-        // Subject-wise grouped data
-        subjectWise: filteredSubjects,
-
-        // All data (for backward compatibility)
-        all: {
-          quizzes: allQuizzes,
-          contents: allContents,
-          subjects: subjects.map(s => ({
-            id: s._id,
-            name: s.name,
-            description: s.description,
-          })),
-        },
-
-        // Summary
-        summary: {
-          totalSubjects: filteredSubjects.length,
-          totalQuizzes: allQuizzes.length,
-          totalContents: allContents.length,
-        },
-      },
+        contents,
+        subjects,
+        quizzes,
+      }
     });
   } catch (error) {
-    console.error("Error fetching explore data:", error);
-    res.status(500).json({
-      success: false,
-      error: "Error fetching explore data",
-      details: error.message
-    });
+    res.status(500).json({ error: "Error fetching overview", details: error.message });
   }
 };
 

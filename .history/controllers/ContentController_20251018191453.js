@@ -170,7 +170,7 @@ exports.getExplore = async (req, res) => {
       data: {
         // Subject-wise grouped data
         subjectWise: filteredSubjects,
-
+        
         // All data (for backward compatibility)
         all: {
           quizzes: allQuizzes,
@@ -181,7 +181,7 @@ exports.getExplore = async (req, res) => {
             description: s.description,
           })),
         },
-
+        
         // Summary
         summary: {
           totalSubjects: filteredSubjects.length,
@@ -192,10 +192,10 @@ exports.getExplore = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching explore data:", error);
-    res.status(500).json({
+    res.status(500).json({ 
       success: false,
-      error: "Error fetching explore data",
-      details: error.message
+      error: "Error fetching explore data", 
+      details: error.message 
     });
   }
 };
